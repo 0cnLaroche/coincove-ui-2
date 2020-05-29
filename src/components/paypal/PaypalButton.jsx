@@ -7,7 +7,8 @@ const CLIENT = {
   sandbox:
      "Ab8_gNCwzEzgMa1I7cqzfxVPBeB63uSYZNL6X5MgfqvB3kE7FBZIynQFpn5JVarL3fZhnD0QjWB-GliU",
   production:
-     "your_production_key"
+      "Ab8_gNCwzEzgMa1I7cqzfxVPBeB63uSYZNL6X5MgfqvB3kE7FBZIynQFpn5JVarL3fZhnD0QjWB-GliU",
+  // TODO add production key. This is the dev key
  };
 
 const CLIENT_ID =
