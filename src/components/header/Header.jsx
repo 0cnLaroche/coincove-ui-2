@@ -91,7 +91,19 @@ const Header = (props) => {
             >
               Home
           </Link>
-
+          {authTokens ? 
+          <Link
+              color="inherit"
+              noWrap
+              key="home"
+              variant="body2"
+              className={classes.toolbarLink}
+              component={RouterLink}
+              to="/manager/item-creator"
+            >
+              Add new item
+          </Link> 
+          : null }
           {sections.map((section) => (
             <Link
               to={section.url}
