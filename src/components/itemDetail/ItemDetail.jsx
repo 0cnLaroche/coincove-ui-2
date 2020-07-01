@@ -1,14 +1,28 @@
-import React from 'react';
-import { Container, CssBaseline, CardMedia, Grid } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import { Container, CssBaseline, CardMedia, CardContent,
+     Grid, 
+     Typography} from '@material-ui/core';
 import { useParams } from 'react-router-dom';
 import Sidebar from './sidebar/Sidebar';
 import { fetchItem } from '../../api';
 
 const ItemDetail = (props) => {
-    let { itemId } = useParams();
-    const item = fetchItem(itemId);
+    const { itemId } = useParams();
     const {handleBasketItemAdded} = props;
-    // Set item as state?
+    const [item, setItem] = useState();
+
+    const fetchData = async (id) => {
+        const fetchedItem = await fetchItem(id);
+        setItem(fetchedItem);
+    }
+
+    useEffect(() => {
+        fetchData(itemId);
+    }, [itemId]);
+
+    if (!item) {
+        return "Loading ..."
+    }
     return (
         <Container component="main" maxWidth="sm">
             <CssBaseline />
@@ -16,11 +30,16 @@ const ItemDetail = (props) => {
                 <Container>
                     <CardMedia
                         component="img"
-                        image="https://source.unsplash.com/random" 
+                        image={item.imageUrl} 
                         alt="random"
                     />
-                    This item id {itemId}
+                    <CardContent>
+                        <Typography variant="h3">{item.name}</Typography>
+                        <Typography variant="h5">{item.producer}</Typography>
+                        <Typography variant="body2">{item.description}</Typography>
+                    </CardContent>
                 </Container>
+                
                 <Sidebar 
                     item={item}
                     handleBasketItemAdded={handleBasketItemAdded}

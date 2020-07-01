@@ -5,9 +5,11 @@ import { SignUp, SignIn, Header, Home, Checkout, Manager,
 import { AuthContext } from './context/auth';
 
 const sections = [
-    { title:"Sign Up", url: "/sign-up", component:{SignUp}}
+    { title:"Sign Up", url: "/sign-up", component:{SignUp}},
+    { title:"Vendu", url: "/", component:{Home}},
+    { title:"Contact us", url: "/", component:{Home}}
   ];
-const title = "SigneDeVie"
+const title = "SigneDeVie";
 
 class App extends React.Component {
 
@@ -28,7 +30,8 @@ class App extends React.Component {
         this.setTokens = this.setTokens.bind(this);
     }
     setTokens(data) {
-        localStorage.setItem("tokens", JSON.stringify(data));
+        // FIXME this is unsafe . Use cookie instead
+        // localStorage.setItem("tokens", JSON.stringify(data));
         this.setState({authTokens: data}, () => {
             console.log(this.state.authTokens);
         });

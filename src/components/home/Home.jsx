@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Typography,
     Container,
@@ -47,7 +47,17 @@ const useStyles = makeStyles((theme) => ({
 
 const Home = ({handleBasketItemAdded}) => {
     const classes = useStyles();
-    const items = fetchItemList();
+    const [ items, setItems] = useState([]);
+    
+    useEffect(() => {
+      async function fetchData() {
+        const fetchedItems = await fetchItemList();
+        //console.log(fetchedItems);
+        setItems(fetchedItems);
+      }
+      fetchData();
+    },[]);
+
     return (
         <main>
         <Container className={classes.cardGrid} maxWidth="md">
@@ -58,7 +68,7 @@ const Home = ({handleBasketItemAdded}) => {
                 <Card className={classes.card}>
                   <CardMedia
                     className={classes.cardMedia}
-                    image="https://source.unsplash.com/random"
+                    image={item.imageUrl}
                     title="Image title"
                   />
                   <CardContent className={classes.cardContent}>
@@ -70,7 +80,7 @@ const Home = ({handleBasketItemAdded}) => {
                     </Typography>
                   </CardContent>
                   <CardActions>
-                    <Button to={`/items/${item.id}`} size="small" color="primary" component={Link}>
+                    <Button to={`/items/${item._id}`} size="small" color="primary" component={Link}>
                       View
                     </Button>
                     <Button size="small" color="primary" onClick={(e) => handleBasketItemAdded(item)}>

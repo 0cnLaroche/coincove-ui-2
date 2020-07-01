@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../../context/auth';
 import {
   Container,
   makeStyles,
@@ -9,6 +10,7 @@ import {
   InputAdornment,
   Button
 } from '@material-ui/core';
+import { postItem, postImage } from '../../../api';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -43,14 +45,19 @@ const ImportedImage = (props) => {
         : <p>no file selected</p>
       }
     </div>
-  )
-}
-
+  )}
 
 const ItemCreator = (props) => {
   const classes = useStyles();
+  const [isCreated, setIsCreated] = useState(false);
+  const [isError, setIsError] = useState()
   const [selectedFile, setSelectedFile] = useState();
   const [imgDataUrl, setImgDataUrl] = useState();
+  const [itemName, setItemName] = useState();
+  const [itemCreator, setItemCreator] = useState();
+  const [itemDetail, setItemDetail] = useState();
+  const [itemPrice, setItemPrice] = useState();
+  const { authTokens } = useAuth();
 
   const onFileChange = event => {
     var file = event.target.files[0];
@@ -59,18 +66,32 @@ const ItemCreator = (props) => {
     var reader = new FileReader();
     reader.onload = () => {
       var dataUrl = reader.result;
+      console.log(dataUrl);
       setImgDataUrl(dataUrl);
     }
     reader.readAsDataURL(file);
-
   }
-  const onFileUpload = () => {
-    const formData = new FormData();
-    formData.append("product picture",
-      selectedFile,
-      selectedFile.name)
-
-    // Call API with formData
+  
+  const onItemSubmit = async () => {
+    var imageUrl = "###";
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append("picture",
+        selectedFile,
+        selectedFile.name);
+      var { url } = await postImage(formData, authTokens);
+      imageUrl = url;
+    }
+    var item = {
+      name: itemName,
+      producer: itemCreator,
+      description: itemDetail,
+      imageUrl: imageUrl,
+      inventory: 1,
+      price: Number(itemPrice)
+    }
+    console.log(item);
+    item = await postItem(item, authTokens);
   }
   return (
     <Container component="main" maxWidth="xs">
@@ -84,6 +105,8 @@ const ItemCreator = (props) => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
+                value={itemName}
+                onChange={e => setItemName(e.target.value)}
                 name="itemName"
                 variant="outlined"
                 required
@@ -95,6 +118,8 @@ const ItemCreator = (props) => {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                value={itemCreator}
+                onChange={e => setItemCreator(e.target.value)}
                 name="itemCreator"
                 variant="outlined"
                 required
@@ -106,6 +131,8 @@ const ItemCreator = (props) => {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                value={itemDetail}
+                onChange={e => setItemDetail(e.target.value)}
                 name="itemDetail"
                 variant="outlined"
                 multiline
@@ -117,12 +144,14 @@ const ItemCreator = (props) => {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                name="itemAmount"
+                value={itemPrice}
+                onChange={e => setItemPrice(e.target.value)}
+                name="itemPrice"
                 variant="outlined"
                 required
                 fullWidth
-                id="itemAmount"
-                label="Amount"
+                id="itemPrice"
+                label="Price"
                 autoFocus
                 InputProps={{
                   startAdornment: <InputAdornment position="start">$</InputAdornment>
@@ -140,20 +169,20 @@ const ItemCreator = (props) => {
           <label htmlFor="contained-button-file">
             <Button fullWidth variant="contained" color="primary" component="span" className={classes.button}>
               Upload picture
-                      </Button>
+             </Button>
           </label>
           <Button
-            type="submit"
+            type="button"
             fullWidth
             variant="contained"
             color="primary"
             className={classes.button}
+            onClick={e => onItemSubmit()}
           >
             Submit
-                    </Button>
+          </Button>
         </form>
       </div>
-
     </Container>
   )
 }

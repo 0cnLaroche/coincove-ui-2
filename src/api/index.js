@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useAuth } from '../context/auth';
-import mockedItemList from './mockedItemList.json';
-import mockedUserList from './mockedUserList.json';
+
+const HOST = process.env.REACT_APP_API;
 
 const config = (token) => {
     let config = {headers:{}};
@@ -10,20 +10,17 @@ const config = (token) => {
             "Authorization" : `Bearer ${token}`
         }
     }
+    return config;
 }
 
-export const fetchItemList = () => {
-    try {
-        // make rest api call here
-        return mockedItemList;
-    } catch (error) {
-        console.error(error);
-    }
+export const fetchItemList = async () => {
+    var { data } = await axios.get(`${HOST}/items`);
+    return data;
 }
 
-export const fetchUser = (token) => {
+export const fetchUser = async (id, token) => {
     try {
-        axios.get(".../user/data", config(token))
+        return axios.get(`${HOST}/users/${id}`, config(token))
         .then(result => {
             if (result.status === 200) {
                 return result.data;
@@ -37,33 +34,48 @@ export const fetchUser = (token) => {
     }
 }
 
-export const authenticate = (userName, pwd) => {
-    try {
-        //return null;
-        return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjb2luY292ZS11aS0yIiwibmFtZSI6IlNhbXVlbCBMYXJvY2hlIiwicm9sZSI6ImFkbWluIiwiZW1haWwiOiJzYW11ZWxsYXJvY2hlQGxpdmUuY2EiLCJpYXQiOjE1MTYyMzkwMjJ9.hlUVKoHw1dFJq0keEhPeWQ-dkXFYf2n4FcK4e2Y6qEg";
-        /*
-        axios.post("...user/login", {userName, pwd})
-        .then(result => {
-            if (result.status === 200) {
-                return result.data;
-            } else {
-                return false;
-            }
-        })
-        */
-
-    } catch (error) {
-        console.error(error);
-        return false;
-    }
-}
-
-export const fetchItem = (id) => {
-    for (let item of mockedItemList) {
-        if (item.id == id) {
-            console.log("matched")
-            return item;
+export const authenticate = async (email, password) => {
+    return axios.post(`${HOST}/login`, {email: email, password: password})
+    .then(result => {
+        if(result.status === 200) {
+            console.log(result.data);
+            return result.data;
         }
+    })
+    .catch(error => console.error(error));
+}
+
+export const fetchItem = async (id) => {
+    const { data } = await axios.get(`${HOST}/items/${id}`);
+    return data;
+}
+
+export const postItem = async (item, authToken) => {
+    try {
+        return axios.post(`${HOST}/items`, item, config(authToken))
+        .then(result => {
+            if (result.status === 201) {
+                return result.data;
+            } else {
+                return false;
+            }
+        });
+    } catch (error) {
+        console.error(error);
     }
+
+}
+
+export const postImage = async (data, authToken) => {
+    
+    return axios.post(`${HOST}/files/picture`, data, config(authToken))
+        .then(result => {
+            if(result.status === 201) {
+                return result.data;
+            }
+        })
+        .catch(error => {
+            console.log(error.response);
+        })
 }
 

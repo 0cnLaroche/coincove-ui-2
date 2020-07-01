@@ -40,8 +40,11 @@ const SignIn = (props) => {
   const [password, setPassword] = useState("");
   const { authTokens, setAuthTokens} = useAuth();
 
-  const login = () => {
-    let token = auth(userName, password);
+  const login = async () => {
+    console.log("user:" + userName + " pwd: " + password);
+    var response = await auth(userName, password);
+    var { token } = response;
+    console.log(token);
     if (token) {
       setAuthTokens(token);
       setLoggedIn(true);
