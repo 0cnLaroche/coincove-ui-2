@@ -5,15 +5,18 @@ import { Container, CssBaseline, CardMedia, CardContent,
 import { useParams } from 'react-router-dom';
 import Sidebar from './sidebar/Sidebar';
 import { fetchItem } from '../../api';
+import { useItemContext } from '../../context/item';
 
 const ItemDetail = (props) => {
     const { itemId } = useParams();
     const {handleBasketItemAdded} = props;
     const [item, setItem] = useState();
+    const {itemContext, setItemContext} = useItemContext();
 
     const fetchData = async (id) => {
         const fetchedItem = await fetchItem(id);
         setItem(fetchedItem);
+        setItemContext(fetchedItem);
     }
 
     useEffect(() => {

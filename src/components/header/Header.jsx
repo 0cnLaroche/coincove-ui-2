@@ -10,7 +10,8 @@ import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 import { Link as RouterLink, withRouter } from 'react-router-dom';
-import { useAuth } from '../../context/auth';
+import { useAuthContext } from '../../context/auth';
+import { useItemContext } from '../../context/item';
 
 const useStyles = makeStyles((theme) => ({
     toolbar: {
@@ -32,7 +33,9 @@ const useStyles = makeStyles((theme) => ({
 const Header = (props) => {
     const classes = useStyles();
     const { sections, title } = props;
-    const { authTokens, setAuthTokens } = useAuth();
+    const { authTokens, setAuthTokens } = useAuthContext();
+    const { itemContext } = useItemContext();
+    console.log(itemContext);
     const basketSize = props.basketSize;
 
     const userButton = (auth) => {
@@ -83,7 +86,7 @@ const Header = (props) => {
           <Link
               color="inherit"
               noWrap
-              key="home"
+              //key="home"
               variant="body2"
               className={classes.toolbarLink}
               component={RouterLink}
@@ -95,13 +98,26 @@ const Header = (props) => {
           <Link
               color="inherit"
               noWrap
-              key="home"
+              //key="home"
               variant="body2"
               className={classes.toolbarLink}
               component={RouterLink}
               to="/manager/item-creator"
             >
               Add new item
+          </Link> 
+          : null }
+          {(authTokens && itemContext) ? 
+          <Link
+              color="inherit"
+              noWrap
+              //key="home"
+              variant="body2"
+              className={classes.toolbarLink}
+              component={RouterLink}
+              to={`/manager/item-update/${itemContext._id}`}
+            >
+            Update Item
           </Link> 
           : null }
           {sections.map((section) => (

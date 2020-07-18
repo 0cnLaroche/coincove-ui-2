@@ -28,9 +28,9 @@ function createRow(desc, qty, unit) {
     return {desc, qty, unit, price};
 }
 
-function shipping(basket) {
-  if (basket.items.length >= ITEMS_FOR_FREE_SHIPPING 
-    || basket.items.length === 0) {
+function shipping(items) {
+  if (items.length >= ITEMS_FOR_FREE_SHIPPING 
+    || items.length === 0) {
     return 0.0;
   }
   return SHIPPING_RATE;
@@ -44,7 +44,7 @@ const Checkout = ({basket}) => {
     const rows = basket.items.map((item) => createRow(item.name, 1, item.price));
     const invoiceSubtotal = subtotal(rows);
     //const invoiceTaxes = TAX_RATE * invoiceSubtotal;
-    const invoiceShipping = shipping(basket);
+    const invoiceShipping = shipping(basket.iems);
     const invoiceTotal = invoiceShipping + invoiceSubtotal;
 
     return (

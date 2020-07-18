@@ -8,3 +8,5 @@ export { default as PaypalButton } from './paypal/PaypalButton';
 export { default as Manager } from './manager/Manager';
 export { default as PrivateRoute } from './privateRoute/PrivateRoute';
 export { default as ItemDetail } from './itemDetail/ItemDetail';
+export { default as ContactUs } from './contactUs/ContactUs';
+export { default as AboutUs } from './aboutUs/AboutUs';

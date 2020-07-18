@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useAuth } from '../context/auth';
+import { useAuthContext } from '../context/auth';
 
 const HOST = process.env.REACT_APP_API;
 
@@ -63,7 +63,21 @@ export const postItem = async (item, authToken) => {
     } catch (error) {
         console.error(error);
     }
+}
 
+export const putItem = async (item, itemId, authToken) => {
+    try {
+        return axios.put(`${HOST}/items/${itemId}`, item, config(authToken))
+        .then(result => {
+            if (result.status === 200) {
+                return result.data;
+            } else {
+                return false;
+            }
+        });
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 export const postImage = async (data, authToken) => {

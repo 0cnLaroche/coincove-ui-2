@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Copyright } from '../';
 import { authenticate as auth } from '../../api';
-import { useAuth } from '../../context/auth';
+import { useAuthContext } from '../../context/auth';
 import { Redirect } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -38,13 +38,11 @@ const SignIn = (props) => {
   const [isError, setIsError] = useState(false);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  const { authTokens, setAuthTokens} = useAuth();
+  const { authTokens, setAuthTokens} = useAuthContext();
 
   const login = async () => {
-    console.log("user:" + userName + " pwd: " + password);
     var response = await auth(userName, password);
     var { token } = response;
-    console.log(token);
     if (token) {
       setAuthTokens(token);
       setLoggedIn(true);
@@ -59,8 +57,6 @@ const SignIn = (props) => {
     }
     setIsError(false);
   };
-  //const referer = props.location.state.referer || "/";
-// TODO call api on submit
 
   if(isLoggedIn) {
     return (

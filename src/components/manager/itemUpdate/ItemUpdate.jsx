@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuthContext } from '../../../context/auth';
+import { useItemContext } from '../../../context/item';
 import { useParams, Redirect } from 'react-router-dom';
 import {
   Container,
@@ -11,7 +12,7 @@ import {
   InputAdornment,
   Button
 } from '@material-ui/core';
-import { postItem, postImage, fetchItem } from '../../../api';
+import { putItem, postImage, fetchItem } from '../../../api';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -48,32 +49,39 @@ const ImportedImage = (props) => {
     </div>
   )}
 
-const ItemCreator = (props) => {
+const ItemUpdate = (props) => {
   const classes = useStyles();
-  const [isCreated, setIsCreated] = useState(false);
+  const [isUpdated, setIsUpdated] = useState(false);
+  //const [isCreated, setIsCreated] = useState(false);
   const [isError, setIsError] = useState();
   const [selectedFile, setSelectedFile] = useState();
   const { itemId } = useParams();
   const [imgDataUrl, setImgDataUrl] = useState();
-  const [itemName, setItemName] = useState();
-  const [itemCreator, setItemCreator] = useState();
-  const [itemDetail, setItemDetail] = useState();
-  const [itemPrice, setItemPrice] = useState();
+  const nameTextField = useRef(null);
+  const producerTextField = useRef(null);
+  const detailsTextField = useRef(null);
+  const priceTextField = useRef(null);
   const { authTokens } = useAuthContext();
 
   const fetchData = async (id) => {
     const item = await fetchItem(id);
-    setItemName(item.name);
-    setItemCreator(item.producer);
-    setItemDetail(item.description);
-    setItemPrice(item.price);
-    setImgDataUrl(item.imageUrl);
+    if(item) {
+      setImgDataUrl(item.imageUrl);
+      nameTextField.current.value = item.name;
+      producerTextField.current.value = item.producer;
+      detailsTextField.current.value = item.description;
+      priceTextField.current.value = item.price;
+    } else {
+      setIsError(true);
+    }
 }
   
 
   useEffect(() => {
     if( itemId !== undefined ) {
       fetchData(itemId);
+    } else {
+      setIsError(true);
     }
   }, [itemId]);
 
@@ -99,22 +107,23 @@ const ItemCreator = (props) => {
         selectedFile.name);
       var { url } = await postImage(formData, authTokens);
       imageUrl = url;
+    } else {
+      imageUrl = imgDataUrl;
     }
     var item = {
-      name: itemName,
-      producer: itemCreator,
-      description: itemDetail,
+      name: nameTextField.current.value,
+      producer: producerTextField.current.value,
+      description: detailsTextField.current.value,
       imageUrl: imageUrl,
       inventory: 1,
-      price: Number(itemPrice)
+      price: Number(priceTextField.current.value)
     }
-    //console.log(item);
-    item = await postItem(item, authTokens);
-    setIsCreated(true);
+    item = await putItem(item, itemId, authTokens);
+    setIsUpdated(true);
   }
-  if(isCreated) {
+  if(isUpdated) {
     return (
-      <Redirect to="/"/>
+    <Redirect to={`/items/${itemId}`}/>
     )
   }
   return (
@@ -129,8 +138,8 @@ const ItemCreator = (props) => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
-                value={itemName}
-                onChange={e => setItemName(e.target.value)}
+                inputRef={nameTextField}
+                defaultValue="UPDATE ME"
                 name="itemName"
                 variant="outlined"
                 required
@@ -142,21 +151,21 @@ const ItemCreator = (props) => {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                value={itemCreator}
-                onChange={e => setItemCreator(e.target.value)}
-                name="itemCreator"
+                inputRef={producerTextField}
+                defaultValue="UPDATE ME"
+                name="itemProducer"
                 variant="outlined"
                 required
                 fullWidth
-                id="itemCreator"
+                id="itemProducer"
                 label="Creator"
                 autoFocus
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
-                value={itemDetail}
-                onChange={e => setItemDetail(e.target.value)}
+                inputRef={detailsTextField}
+                defaultValue="UPDATE ME"
                 name="itemDetail"
                 variant="outlined"
                 multiline
@@ -168,8 +177,8 @@ const ItemCreator = (props) => {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                value={itemPrice}
-                onChange={e => setItemPrice(e.target.value)}
+                inputRef={priceTextField}
+                defaultValue="UPDATE ME"
                 name="itemPrice"
                 variant="outlined"
                 required
@@ -211,4 +220,4 @@ const ItemCreator = (props) => {
   )
 }
 
-export default ItemCreator;
+export default ItemUpdate;
