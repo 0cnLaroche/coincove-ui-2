@@ -35,7 +35,6 @@ const Header = (props) => {
     const { sections, title } = props;
     const { authTokens, setAuthTokens } = useAuthContext();
     const { itemContext } = useItemContext();
-    console.log(itemContext);
     const basketSize = props.basketSize;
 
     const userButton = (auth) => {

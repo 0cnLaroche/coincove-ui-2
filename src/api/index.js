@@ -80,16 +80,29 @@ export const putItem = async (item, itemId, authToken) => {
     }
 }
 
+// fix me : remove async?
 export const postImage = async (data, authToken) => {
     
     return axios.post(`${HOST}/files/picture`, data, config(authToken))
-        .then(result => {
-            if(result.status === 201) {
-                return result.data;
+        .then(response => {
+            if(response.status === 201) {
+                return response.data;
             }
         })
         .catch(error => {
             console.log(error.response);
         })
+}
+
+export const postOrder = (order) => {
+    axios.post(`${HOST}/orders`, order)
+    .then(response => {
+        if (response.status === 201) {
+            return response.data;
+        }
+    })
+    .catch(error => {
+        console.log(error);
+    })
 }
 

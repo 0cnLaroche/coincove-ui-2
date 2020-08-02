@@ -44,7 +44,7 @@ const Checkout = ({basket}) => {
     const rows = basket.items.map((item) => createRow(item.name, 1, item.price));
     const invoiceSubtotal = subtotal(rows);
     //const invoiceTaxes = TAX_RATE * invoiceSubtotal;
-    const invoiceShipping = shipping(basket.iems);
+    const invoiceShipping = shipping(basket.items);
     const invoiceTotal = invoiceShipping + invoiceSubtotal;
 
     return (
@@ -96,7 +96,14 @@ const Checkout = ({basket}) => {
             </TableBody>
           </Table>
         </TableContainer>
-        <PaypalButton invoiceTotal={invoiceTotal}/> 
+        <PaypalButton order={
+          {
+            items: basket.items,
+            total: invoiceTotal,
+            shipping: invoiceShipping,
+            subtotal: invoiceSubtotal
+          }
+          }/> 
         </Container>
 
     )

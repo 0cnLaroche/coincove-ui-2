@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import scriptLoader from "react-async-script-loader";
 import {CircularProgress, Container } from '@material-ui/core';
+import { postOrder } from '../../api';
 
 const CLIENT = {
   sandbox:
@@ -24,8 +25,8 @@ class PaypalButton extends React.Component {
       loading: true,
       paid: false
     };
-
-    this.paymentAmount = props.invoiceTotal;
+    this.order = props.order;
+    //this.paymentAmount = props.invoiceTotal;
 
     window.React = React;
     window.ReactDOM = ReactDOM;
@@ -58,25 +59,67 @@ class PaypalButton extends React.Component {
     return null;
   }
   createOrder = (data, actions) => {
+    const { total, items } = this.order;
+    console.log("Creating Order");
     return actions.order.create({
       purchase_units: [
         {
-          description: +"Arts",
+          description: "description",
           amount: {
             currency_code: "CAD",
-            value: this.paymentAmount
-          }
+            value: total
+          },
+          //items: items.map( (item) => { return { name: item.name, unit_amount: item.price, quantity: 1 }}),
+          //invoice_id: ""
         }
-      ]
+      ],
+      //payer: ""
     });
   };
 
   onApprove = (data, actions) => {
     actions.order.capture().then(details => {
+      const captureId = details.purchase_units[0].payments.captures[0].id;
       const paymentData = {
-        payerID: data.payerID,
-        orderID: data.orderID
+        payerId: data.payerID,
+        orderId: data.orderID,
+        captureId: captureId
       };
+
+      const {total, subtotal, shipping, items} = this.order;
+      const {address_line_1, address_line_2, admin_area_1, admin_area_2, 
+        country_code, postal_code } = details.purchase_units[0].shipping.address;
+
+      const shippingAddress = {
+        address1: address_line_1,
+        address2: address_line_2,
+        city: admin_area_1,
+        state: admin_area_2,
+        country: country_code,
+        postalCode: postal_code
+      }
+
+      const orderLines = items.map( item => {
+        return {
+          description: item.name, 
+          itemId: item._id, 
+          units: 1, 
+          price: item.price, 
+          discount: item.discount
+        }
+      })
+
+      let order = {
+        shippingAddress,
+        billingAddress: shippingAddress,
+        orderLines,
+        total,
+        subtotal,
+        shipping,
+        paymentId: captureId
+      }
+      console.log(order);
+      postOrder(order);
       console.log("Payment Approved: ", paymentData);
       this.setState({ showButtons: false, paid: true });
     });
@@ -84,7 +127,6 @@ class PaypalButton extends React.Component {
 
   render() {
     const { showButtons, loading, paid } = this.state;
-
     return (
       <Container>
         {loading && <CircularProgress />}
