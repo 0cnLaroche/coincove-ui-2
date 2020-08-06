@@ -59,7 +59,7 @@ const ItemCreator = (props) => {
   const [itemCreator, setItemCreator] = useState();
   const [itemDetail, setItemDetail] = useState();
   const [itemPrice, setItemPrice] = useState();
-  const { authTokens } = useAuthContext();
+  const { authContext } = useAuthContext();
 
   const fetchData = async (id) => {
     const item = await fetchItem(id);
@@ -97,7 +97,7 @@ const ItemCreator = (props) => {
       formData.append("picture",
         selectedFile,
         selectedFile.name);
-      var { url } = await postImage(formData, authTokens);
+      var { url } = await postImage(formData, authContext);
       imageUrl = url;
     }
     var item = {
@@ -109,7 +109,7 @@ const ItemCreator = (props) => {
       price: Number(itemPrice)
     }
     //console.log(item);
-    item = await postItem(item, authTokens);
+    item = await postItem(item, authContext);
     setIsCreated(true);
   }
   if(isCreated) {

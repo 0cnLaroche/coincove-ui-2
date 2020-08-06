@@ -1,11 +1,12 @@
 import axios from 'axios';
-import { useAuthContext } from '../context/auth';
 
 const HOST = process.env.REACT_APP_API;
 
-const config = (token) => {
+const config = (authentication) => {
+    let { token } = authentication;
     let config = {headers:{}};
     if (token) {
+        console.log(token);
         config.headers = {
             "Authorization" : `Bearer ${token}`
         }
@@ -18,9 +19,9 @@ export const fetchItemList = async () => {
     return data;
 }
 
-export const fetchUser = async (id, token) => {
+export const fetchUser = async (id, authentication) => {
     try {
-        return axios.get(`${HOST}/users/${id}`, config(token))
+        return axios.get(`${HOST}/users/${id}`, config(authentication))
         .then(result => {
             if (result.status === 200) {
                 return result.data;
@@ -35,14 +36,7 @@ export const fetchUser = async (id, token) => {
 }
 
 export const authenticate = async (email, password) => {
-    return axios.post(`${HOST}/login`, {email: email, password: password})
-    .then(result => {
-        if(result.status === 200) {
-            console.log(result.data);
-            return result.data;
-        }
-    })
-    .catch(error => console.error(error));
+    return axios.post(`${HOST}/login`, {email: email, password: password});
 }
 
 export const fetchItem = async (id) => {
@@ -50,9 +44,9 @@ export const fetchItem = async (id) => {
     return data;
 }
 
-export const postItem = async (item, authToken) => {
+export const postItem = async (item, authentication) => {
     try {
-        return axios.post(`${HOST}/items`, item, config(authToken))
+        return axios.post(`${HOST}/items`, item, config(authentication))
         .then(result => {
             if (result.status === 201) {
                 return result.data;
@@ -65,9 +59,9 @@ export const postItem = async (item, authToken) => {
     }
 }
 
-export const putItem = async (item, itemId, authToken) => {
+export const putItem = async (item, itemId, authentication) => {
     try {
-        return axios.put(`${HOST}/items/${itemId}`, item, config(authToken))
+        return axios.put(`${HOST}/items/${itemId}`, item, config(authentication))
         .then(result => {
             if (result.status === 200) {
                 return result.data;
@@ -81,9 +75,9 @@ export const putItem = async (item, itemId, authToken) => {
 }
 
 // fix me : remove async?
-export const postImage = async (data, authToken) => {
+export const postImage = async (data, authentication) => {
     
-    return axios.post(`${HOST}/files/picture`, data, config(authToken))
+    return axios.post(`${HOST}/files/picture`, data, config(authentication))
         .then(response => {
             if(response.status === 201) {
                 return response.data;
@@ -104,5 +98,17 @@ export const postOrder = (order) => {
     .catch(error => {
         console.log(error);
     })
+}
+
+export const getOrders = async (authentication) => {
+    console.log(config(authentication));
+    const { data } = await axios.get(`${HOST}/orders`, config(authentication));
+    return data;
+}
+
+export const getOrder = async (id, authentication) => {
+    console.log(config(authentication));
+    const { data } = await axios.get(`${HOST}/order/${id}`, config(authentication));
+    return data;
 }
 

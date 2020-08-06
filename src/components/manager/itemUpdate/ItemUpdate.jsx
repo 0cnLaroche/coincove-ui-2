@@ -61,7 +61,7 @@ const ItemUpdate = (props) => {
   const producerTextField = useRef(null);
   const detailsTextField = useRef(null);
   const priceTextField = useRef(null);
-  const { authTokens } = useAuthContext();
+  const { authContext } = useAuthContext();
 
   const fetchData = async (id) => {
     const item = await fetchItem(id);
@@ -105,7 +105,7 @@ const ItemUpdate = (props) => {
       formData.append("picture",
         selectedFile,
         selectedFile.name);
-      var { url } = await postImage(formData, authTokens);
+      var { url } = await postImage(formData, authContext);
       imageUrl = url;
     } else {
       imageUrl = imgDataUrl;
@@ -118,7 +118,7 @@ const ItemUpdate = (props) => {
       inventory: 1,
       price: Number(priceTextField.current.value)
     }
-    item = await putItem(item, itemId, authTokens);
+    item = await putItem(item, itemId, authContext);
     setIsUpdated(true);
   }
   if(isUpdated) {

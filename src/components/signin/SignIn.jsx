@@ -38,13 +38,14 @@ const SignIn = (props) => {
   const [isError, setIsError] = useState(false);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  const { authTokens, setAuthTokens} = useAuthContext();
+  const { authContext, setAuthContext} = useAuthContext();
 
   const login = async () => {
     var response = await auth(userName, password);
-    var { token } = response;
-    if (token) {
-      setAuthTokens(token);
+    let authentication = response.data;
+    console.log(authentication);
+    if (authentication) {
+      setAuthContext(authentication);
       setLoggedIn(true);
       setIsError(false);
     } else {

@@ -10,7 +10,7 @@ const sections = [
     { title:"Vendu", url: "/", component:{Home}},
     { title:"Contact us", url: "/contact-us", component:{ContactUs}}
   ];
-const title = "SigneDeVie";
+const title = process.env.REACT_APP_TITLE;
 
 class App extends React.Component {
 
@@ -24,18 +24,18 @@ class App extends React.Component {
             basketSize: 0,
             user: null,
             // Loading existing tokens
-            authTokens: JSON.parse(localStorage.getItem("tokens")),
+            authentication: JSON.parse(localStorage.getItem("authentication_storage")),
             currentItem: null
         }
         this.handleBasketItemAdded = this.handleBasketItemAdded.bind(this);
         this.handleBasketUpdate = this.handleBasketItemAdded.bind(this);
-        this.setTokens = this.setTokens.bind(this);
+        this.setAuthentication = this.setAuthentication.bind(this);
         this.setCurrentItem = this.setCurrentItem.bind(this);
     }
-    setTokens(data) {
+    setAuthentication(data) {
         // FIXME this is unsafe . Use cookie instead
-        // localStorage.setItem("tokens", JSON.stringify(data));
-        this.setState({authTokens: data});
+        localStorage.setItem("authentication_storage", JSON.stringify(data));
+        this.setState({authentication: data});
     }
     setCurrentItem(item) {
         console.log(item);
@@ -50,7 +50,7 @@ class App extends React.Component {
     }
     render() {
         return (
-            <AuthContext.Provider value={{authTokens: this.state.authTokens, setAuthTokens: this.setTokens}}>
+            <AuthContext.Provider value={{authContext: this.state.authentication, setAuthContext: this.setAuthentication}}>
             <ItemContext.Provider value={{itemContext: this.state.currentItem, setItemContext: this.setCurrentItem}}>
             <Router>
                 <Header title={title} basketSize={this.state.basketSize} sections={sections}/>

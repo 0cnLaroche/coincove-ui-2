@@ -52,7 +52,6 @@ const Home = ({handleBasketItemAdded}) => {
     useEffect(() => {
       async function fetchData() {
         const fetchedItems = await fetchItemList();
-        //console.log(fetchedItems);
         setItems(fetchedItems);
       }
       fetchData();

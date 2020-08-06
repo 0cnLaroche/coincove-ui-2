@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
 const Header = (props) => {
     const classes = useStyles();
     const { sections, title } = props;
-    const { authTokens, setAuthTokens } = useAuthContext();
+    const { authContext, setAuthContext } = useAuthContext();
     const { itemContext } = useItemContext();
     const basketSize = props.basketSize;
 
@@ -54,7 +54,7 @@ const Header = (props) => {
     }
 
     const logOut = () => {
-      setAuthTokens(null);
+      setAuthContext(null);
     }
 
     return (
@@ -79,7 +79,7 @@ const Header = (props) => {
               <ShoppingCartIcon/>
             </IconButton>
           </Badge>
-          {userButton(authTokens)}
+          {userButton(authContext)}
         </Toolbar>
         <Toolbar component="nav" variant="dense" className={classes.toolbarSecondary}>
           <Link
@@ -93,7 +93,7 @@ const Header = (props) => {
             >
               Home
           </Link>
-          {authTokens ? 
+          {authContext ? 
           <Link
               color="inherit"
               noWrap
@@ -106,7 +106,20 @@ const Header = (props) => {
               Add new item
           </Link> 
           : null }
-          {(authTokens && itemContext) ? 
+          {authContext ? 
+          <Link
+              color="inherit"
+              noWrap
+              //key="home"
+              variant="body2"
+              className={classes.toolbarLink}
+              component={RouterLink}
+              to="/manager/orders"
+            >
+              View orders
+          </Link> 
+          : null }
+          {(authContext && itemContext) ? 
           <Link
               color="inherit"
               noWrap
