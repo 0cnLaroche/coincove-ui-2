@@ -4,16 +4,7 @@ import scriptLoader from "react-async-script-loader";
 import {CircularProgress, Container } from '@material-ui/core';
 import { postOrder } from '../../api';
 
-const CLIENT = {
-  sandbox:
-     "Ab8_gNCwzEzgMa1I7cqzfxVPBeB63uSYZNL6X5MgfqvB3kE7FBZIynQFpn5JVarL3fZhnD0QjWB-GliU",
-  production:
-      "Ab8_gNCwzEzgMa1I7cqzfxVPBeB63uSYZNL6X5MgfqvB3kE7FBZIynQFpn5JVarL3fZhnD0QjWB-GliU",
-  // TODO add production key. This is the dev key
- };
-
-const CLIENT_ID =
-  process.env.NODE_ENV === "production" ? CLIENT.production : CLIENT.sandbox;
+const CLIENT_ID = process.env.REACT_APP_PAYPAL_CLIENT_ID;
 
 let PayPalButton = null;
 class PaypalButton extends React.Component {

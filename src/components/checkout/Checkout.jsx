@@ -12,8 +12,8 @@ import Paper from '@material-ui/core/Paper';
 import {PaypalButton} from '../';
 
 const TAX_RATE = 0.07; // Taxes are disabled
-const SHIPPING_RATE = 5.0;
-const ITEMS_FOR_FREE_SHIPPING = 5;
+const SHIPPING_RATE = Number(process.env.REACT_APP_SHIPPING_RATE);
+const SHIPPING_THRESHOLD = Number(process.env.REACT_APP_SHIPPING_THRESHOLD);
 
 function ccyFormat(num) {
     return `${num.toFixed(2)}`;
@@ -28,9 +28,8 @@ function createRow(desc, qty, unit) {
     return {desc, qty, unit, price};
 }
 
-function shipping(items) {
-  if (items.length >= ITEMS_FOR_FREE_SHIPPING 
-    || items.length === 0) {
+function shipping(subtotal) {
+  if (subtotal >= SHIPPING_THRESHOLD || subtotal === 0) {
     return 0.0;
   }
   return SHIPPING_RATE;
@@ -44,7 +43,7 @@ const Checkout = ({basket}) => {
     const rows = basket.items.map((item) => createRow(item.name, 1, item.price));
     const invoiceSubtotal = subtotal(rows);
     //const invoiceTaxes = TAX_RATE * invoiceSubtotal;
-    const invoiceShipping = shipping(basket.items);
+    const invoiceShipping = shipping(invoiceSubtotal);
     const invoiceTotal = invoiceShipping + invoiceSubtotal;
 
     return (
@@ -70,7 +69,7 @@ const Checkout = ({basket}) => {
                 <TableRow key={i}>
                   <TableCell>{row.desc}</TableCell>
                   <TableCell align="right">{row.qty}</TableCell>
-                  <TableCell align="right">{row.unit}</TableCell>
+                  <TableCell align="right">{ccyFormat(row.unit)}</TableCell>
                   <TableCell align="right">{ccyFormat(row.price)}</TableCell>
                 </TableRow>
               ))}
@@ -91,7 +90,7 @@ const Checkout = ({basket}) => {
               </TableRow>*/}
               <TableRow>
                 <TableCell colSpan={2}>Total</TableCell>
-                <TableCell align="right">{ccyFormat(invoiceTotal)}</TableCell>
+                <TableCell align="right">$ {ccyFormat(invoiceTotal)}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
