@@ -41,9 +41,8 @@ const SignIn = (props) => {
   const { authContext, setAuthContext} = useAuthContext();
 
   const login = async () => {
-    var response = await auth(userName, password);
+    let response = await auth(userName, password);
     let authentication = response.data;
-    console.log(authentication);
     if (authentication) {
       setAuthContext(authentication);
       setLoggedIn(true);

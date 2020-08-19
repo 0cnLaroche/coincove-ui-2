@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import styles from './Checkout.module.css';
 import {Container} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -9,6 +10,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import {PaypalButton} from '../';
 
 const TAX_RATE = 0.07; // Taxes are disabled
@@ -40,13 +42,23 @@ function subtotal(items) {
 }
 
 const Checkout = ({basket}) => {
-    const rows = basket.items.map((item) => createRow(item.name, 1, item.price));
+  const [openApprovedDialog, setOpenApprovedDialog] = useState(false);  
+  const rows = basket.items.map((item) => createRow(item.name, 1, item.price));
     const invoiceSubtotal = subtotal(rows);
     //const invoiceTaxes = TAX_RATE * invoiceSubtotal;
     const invoiceShipping = shipping(invoiceSubtotal);
     const invoiceTotal = invoiceShipping + invoiceSubtotal;
+    
+    const handleOnApproved = () => {
+      // TODO Empty baskets
+      setOpenApprovedDialog(true);
+    }
+    const handleCloseApprovedDialog = () => {
+      setOpenApprovedDialog(false);
+    }
 
     return (
+      <div>
         <Container component="main" maxWidth="sm">
         <TableContainer component={Paper}>
           <Table className={styles.table} aria-label="spanning table">
@@ -95,15 +107,30 @@ const Checkout = ({basket}) => {
             </TableBody>
           </Table>
         </TableContainer>
-        <PaypalButton order={
+        <PaypalButton handleOnApproved={handleOnApproved} order={
           {
             items: basket.items,
             total: invoiceTotal,
             shipping: invoiceShipping,
             subtotal: invoiceSubtotal
           }
-          }/> 
+          }/>
         </Container>
+        <Dialog open={openApprovedDialog} onClose={handleCloseApprovedDialog} aria-labelledby="form-dialog-title">
+                <DialogTitle id="form-dialog-title">Payment confirmation</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Thank you for your Order ! Your payment has been confirmed,
+                        you will receive more details about your order very shortly
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseApprovedDialog} color="primary">
+                        Okay!
+                    </Button>
+                </DialogActions>
+            </Dialog>
+      </div>
 
     )
 }

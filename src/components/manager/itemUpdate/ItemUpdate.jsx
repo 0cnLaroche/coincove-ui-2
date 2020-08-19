@@ -55,7 +55,7 @@ const ItemUpdate = (props) => {
   //const [isCreated, setIsCreated] = useState(false);
   const [isError, setIsError] = useState();
   const [selectedFile, setSelectedFile] = useState();
-  const { itemId } = useParams();
+  const { id: itemId } = useParams();
   const [imgDataUrl, setImgDataUrl] = useState();
   const nameTextField = useRef(null);
   const producerTextField = useRef(null);
@@ -74,9 +74,8 @@ const ItemUpdate = (props) => {
     } else {
       setIsError(true);
     }
-}
+  }
   
-
   useEffect(() => {
     if( itemId !== undefined ) {
       fetchData(itemId);

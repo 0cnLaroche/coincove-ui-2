@@ -1,5 +1,6 @@
 import React, {useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -21,7 +22,6 @@ import { useAuthContext, AuthContext } from '../../../context/auth';
 
 const formatDate = (object) => {
   let date = new Date(object);
-  console.log(date.toLocaleString('en-CA'))
   return date.toLocaleString('en-CA');
 }
 
@@ -99,26 +99,31 @@ const useStyles2 = makeStyles({
 const Orders = () => {
   const classes = useStyles2();
   const [orders, setOrders] = useState([]);
+  const [isError, setIsError] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const { authContext } = useAuthContext();
+  const history = useHistory();
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, orders.length - page * rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+  const handleClickOrder = (id) => {
+    history.push(`/manager/orders/${id}`);
+  }
 
   useEffect(() => {
     const fetchData = async () => {
       console.log(authContext);
-      let data = await getOrders(authContext);
-      let rows = data.map(order => {
+      try {
+        let data = await getOrders(authContext);
+        let rows = data.map(order => {
           let row = { 
             id: order._id, 
             date: order.created, 
@@ -130,9 +135,19 @@ const Orders = () => {
         })
         .sort((a, b) => (a.date < b.date ? -1 : 1));
       setOrders(rows);
+      } catch (err) {
+        setIsError(true);
+      }
     };
     fetchData();
   },[]);
+
+  if(isError) {
+    return (
+      <div>There was an error while fetching order list. 
+        Refresh or login again with administrator account</div>
+    )
+  }
 
   return (
     <TableContainer component={Paper}>
@@ -150,7 +165,7 @@ const Orders = () => {
             ? orders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : orders
           ).map((row) => (
-            <TableRow key={row.id} hover>
+            <TableRow onClick={() => handleClickOrder(row.id)} hover key={row.id}>
               <TableCell component="th" scope="row">
                 {formatDate(row.date)}
               </TableCell>

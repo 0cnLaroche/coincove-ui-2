@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { CssBaseline, Container } from '@material-ui/core';
 import { SignUp, SignIn, Header, Home, Checkout, Manager, 
     PrivateRoute, ItemDetail, ContactUs } from './components';
 import { AuthContext } from './context/auth';
@@ -38,7 +39,6 @@ class App extends React.Component {
         this.setState({authentication: data});
     }
     setCurrentItem(item) {
-        console.log(item);
         this.setState({currentItem:item});
     }
     handleBasketItemAdded(item) {
@@ -53,22 +53,27 @@ class App extends React.Component {
             <AuthContext.Provider value={{authContext: this.state.authentication, setAuthContext: this.setAuthentication}}>
             <ItemContext.Provider value={{itemContext: this.state.currentItem, setItemContext: this.setCurrentItem}}>
             <Router>
-                <Header title={title} basketSize={this.state.basketSize} sections={sections}/>
-                <Switch>
-                    <Route path="/" exact>
-                        <Home handleBasketItemAdded={this.handleBasketItemAdded}/>
-                    </Route>
-                    <Route path="/sign-up" component={SignUp} />
-                    <Route path="/sign-in" component={SignIn} />
-                    <Route path="/contact-us" component={ContactUs}/>
-                    <Route path="/items/:itemId" >
-                        <ItemDetail handleBasketItemAdded={this.handleBasketItemAdded}/>
-                    </Route>
-                    <Route path="/checkout">
-                        <Checkout basket={this.state.basket} />
-                    </Route> 
-                    <PrivateRoute path="/manager" component={Manager}/>
-                </Switch>
+                <CssBaseline />
+                <Container maxWidth="lg">
+                    <Header title={title} basketSize={this.state.basketSize} sections={sections}/>
+                    <main>
+                    <Switch>
+                        <Route path="/" exact>
+                            <Home handleBasketItemAdded={this.handleBasketItemAdded}/>
+                        </Route>
+                        <Route path="/sign-up" component={SignUp} />
+                        <Route path="/sign-in" component={SignIn} />
+                        <Route path="/contact-us" component={ContactUs}/>
+                        <Route path="/items/:itemId" >
+                            <ItemDetail handleBasketItemAdded={this.handleBasketItemAdded}/>
+                        </Route>
+                        <Route path="/checkout">
+                            <Checkout basket={this.state.basket} />
+                        </Route> 
+                        <PrivateRoute path="/manager" component={Manager}/>
+                    </Switch>
+                </main>
+                </Container>
             </Router>
             </ItemContext.Provider>
             </AuthContext.Provider>

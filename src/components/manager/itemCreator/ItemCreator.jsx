@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../../../context/auth';
 import { useParams, Redirect } from 'react-router-dom';
+import Compressor from 'compressorjs';
 import {
   Container,
   makeStyles,

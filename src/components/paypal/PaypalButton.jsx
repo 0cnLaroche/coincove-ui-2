@@ -113,6 +113,7 @@ class PaypalButton extends React.Component {
       postOrder(order);
       console.log("Payment Approved: ", paymentData);
       this.setState({ showButtons: false, paid: true });
+      this.props.handleOnApproved();
     });
   };
 

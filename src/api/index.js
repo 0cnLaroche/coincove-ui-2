@@ -6,7 +6,6 @@ const config = (authentication) => {
     let { token } = authentication;
     let config = {headers:{}};
     if (token) {
-        console.log(token);
         config.headers = {
             "Authorization" : `Bearer ${token}`
         }
@@ -101,14 +100,12 @@ export const postOrder = (order) => {
 }
 
 export const getOrders = async (authentication) => {
-    console.log(config(authentication));
     const { data } = await axios.get(`${HOST}/orders`, config(authentication));
     return data;
 }
 
 export const getOrder = async (id, authentication) => {
-    console.log(config(authentication));
-    const { data } = await axios.get(`${HOST}/order/${id}`, config(authentication));
+    const { data } = await axios.get(`${HOST}/orders/${id}`, config(authentication));
     return data;
 }
 
