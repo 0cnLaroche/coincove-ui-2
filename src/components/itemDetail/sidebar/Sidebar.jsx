@@ -27,7 +27,7 @@ export default function Sidebar(props) {
             type="button" 
             fullWidth 
             variant="contained" 
-            color="primary"
+            color="secondary"
             onClick={(e)=> handleBasketItemAdded(item)}>
               Add to basket
           </Button>

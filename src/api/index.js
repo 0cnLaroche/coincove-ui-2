@@ -87,6 +87,22 @@ export const postImage = async (data, authentication) => {
         })
 }
 
+/** PATCH order 
+ * @param id Order ID
+ * @param updates object containing key/value pair of fields to be updated
+ * @param authentication authentication object from API
+ * @returns updated order object
+ */
+export const patchOrder = async (id, updates, authentication) => {
+    try {
+        let { data } = await axios.patch(`${HOST}/orders/${id}`, updates, config(authentication));
+        return data;
+    } catch (err) {
+        console.error(err.message);
+        throw err;
+    }
+}
+
 export const postOrder = (order) => {
     axios.post(`${HOST}/orders`, order)
     .then(response => {

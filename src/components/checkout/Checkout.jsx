@@ -1,21 +1,34 @@
 import React, {useState} from 'react';
-import styles from './Checkout.module.css';
-import {Container} from '@material-ui/core';
+import {useHistory} from 'react-router-dom';
+import {Container, Typography} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import {Stepper, Step, StepLabel} from '@material-ui/core';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
-import {PaypalButton} from '../';
+import PaypalButton from '../paypal/PaypalButton';
+import OrderReview from './OrderReview';
+import AddressForm from '../addressForm/AddressForm';
 
 const TAX_RATE = 0.07; // Taxes are disabled
 const SHIPPING_RATE = Number(process.env.REACT_APP_SHIPPING_RATE);
 const SHIPPING_THRESHOLD = Number(process.env.REACT_APP_SHIPPING_THRESHOLD);
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    marginBottom: theme.spacing(6)
+  },
+  buttons: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+  },
+  button: {
+    marginTop: theme.spacing(3),
+    marginLeft: theme.spacing(1)
+  },
+  stepper: {
+    backgroundColor: 'transparent'
+  }
+}))
 
 function ccyFormat(num) {
     return `${num.toFixed(2)}`;
@@ -41,80 +54,115 @@ function subtotal(items) {
     return items.map(({price}) => price).reduce((sum, i) => sum + i, 0);
 }
 
-const Checkout = ({basket}) => {
-  const [openApprovedDialog, setOpenApprovedDialog] = useState(false);  
-  const rows = basket.items.map((item) => createRow(item.name, 1, item.price));
+const steps = ['Review Order', 'Shipping Address', 'Payment'];
+
+const Checkout = ({basket, handleBasketUpdate}) => {
+    const classes = useStyles();
+    const history = useHistory();
+    const [openApprovedDialog, setOpenApprovedDialog] = useState(false);
+    const [activeStep, setActiveStep] = useState(0); 
+    const [shippingAddress, setShippingAddress] = useState({
+      firstName: null,
+      lastName: null,
+      address1: null,
+      address2: null,
+      city: null,
+      state: null,
+      country: null,
+      postalCode: null
+    }) ;
+    const [isValidationError, setIsValidationError] = useState(true);
+    const [email, setEmail] = useState();
+    const errors = [];
+    const rows = basket.items.map((item) => createRow(item.name, 1, item.price));
     const invoiceSubtotal = subtotal(rows);
     //const invoiceTaxes = TAX_RATE * invoiceSubtotal;
     const invoiceShipping = shipping(invoiceSubtotal);
     const invoiceTotal = invoiceShipping + invoiceSubtotal;
     
     const handleOnApproved = () => {
-      // TODO Empty baskets
       setOpenApprovedDialog(true);
+      basket.items = [];
+      basket.basketSize = 0;
+      //handleBasketUpdate(basket);
     }
     const handleCloseApprovedDialog = () => {
       setOpenApprovedDialog(false);
+      history.push('/'); // Redirect to homepage 
+    }
+    const handleNext = () => {
+      if(!(activeStep === 1 && isValidationError)) {
+        setActiveStep(activeStep + 1);
+      }
+    }
+    const handleBack = () => {
+      setActiveStep(activeStep - 1);
+    }
+    const handleAddressChange = (newAddress, errors) => {
+      if(errors) {
+        setIsValidationError(true);
+      } else {
+        setIsValidationError(false);
+      }
+      setShippingAddress(Object.assign(shippingAddress, newAddress));
+    }
+    const handleEmailChange = (newEmail) => {
+      setEmail(email);
+    }
+    const getStepContent = (step) => {
+      switch(step) {
+        case 0:
+          return <OrderReview rows={rows} invoiceTotal={invoiceTotal} invoiceSubtotal={invoiceSubtotal} invoiceShipping={invoiceShipping}/>;
+        case 1:
+          return <AddressForm handleAddressChange={handleAddressChange} defaultValue={shippingAddress}/>;
+        case 2:
+          return (
+          <PaypalButton 
+            handleOnApproved={handleOnApproved} 
+            order={{
+              items: basket.items,
+              total: invoiceTotal,
+              shipping: invoiceShipping,
+              subtotal: invoiceSubtotal,
+              shippingAddress,
+              email
+            }}
+            handleEmailChange={handleEmailChange}
+            defaultEmail={email}
+          />);
+        default:
+          throw new Error('Unknown step');
+      }
     }
 
     return (
       <div>
         <Container component="main" maxWidth="sm">
-        <TableContainer component={Paper}>
-          <Table className={styles.table} aria-label="spanning table">
-            <TableHead>
-              <TableRow>
-                <TableCell align="center" colSpan={3}>
-                  Details
-                </TableCell>
-                <TableCell align="right">Price</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Desc</TableCell>
-                <TableCell align="right">Qty.</TableCell>
-                <TableCell align="right">Unit</TableCell>
-                <TableCell align="right">Sum</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row, i) => (
-                <TableRow key={i}>
-                  <TableCell>{row.desc}</TableCell>
-                  <TableCell align="right">{row.qty}</TableCell>
-                  <TableCell align="right">{ccyFormat(row.unit)}</TableCell>
-                  <TableCell align="right">{ccyFormat(row.price)}</TableCell>
-                </TableRow>
-              ))}
-
-              <TableRow>
-                <TableCell rowSpan={3} />
-                <TableCell colSpan={2}>Subtotal</TableCell>
-                <TableCell align="right">{ccyFormat(invoiceSubtotal)}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell colSpan={2}>Shipping</TableCell>
-                <TableCell align="right">{ccyFormat(invoiceShipping)}</TableCell>
-              </TableRow>
-              {/*<TableRow>
-                <TableCell>Tax</TableCell>
-                <TableCell align="right">{`${(TAX_RATE * 100).toFixed(0)} %`}</TableCell>
-                <TableCell align="right">{ccyFormat(invoiceTaxes)}</TableCell>
-              </TableRow>*/}
-              <TableRow>
-                <TableCell colSpan={2}>Total</TableCell>
-                <TableCell align="right">$ {ccyFormat(invoiceTotal)}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <PaypalButton handleOnApproved={handleOnApproved} order={
-          {
-            items: basket.items,
-            total: invoiceTotal,
-            shipping: invoiceShipping,
-            subtotal: invoiceSubtotal
-          }
-          }/>
+          <Typography component="h1" variant="h4" align="center">Checkout</Typography>
+          <Stepper activeStep={activeStep} className={classes.stepper}>
+            {steps.map(label => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+          <React.Fragment>
+            {getStepContent(activeStep)}
+              <div className={classes.buttons}>
+                {activeStep !== 0 && (
+                  <Button className={classes.button} onClick={handleBack}>Back</Button>
+                )}
+                {activeStep !== (steps.length - 1) && (
+                  <Button 
+                    variant="contained" 
+                    color="primary" 
+                    className={classes.button}
+                    onClick={handleNext}>
+                      Next
+                    </Button>
+                )}
+              </div>
+          </React.Fragment>
         </Container>
         <Dialog open={openApprovedDialog} onClose={handleCloseApprovedDialog} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Payment confirmation</DialogTitle>

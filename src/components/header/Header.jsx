@@ -32,10 +32,9 @@ const useStyles = makeStyles((theme) => ({
 
 const Header = (props) => {
     const classes = useStyles();
-    const { sections, title } = props;
+    const { sections, title, basketSize } = props;
     const { authContext, setAuthContext } = useAuthContext();
     const { itemContext } = useItemContext();
-    const basketSize = props.basketSize;
 
     const userButton = (auth) => {
       if(auth) {
@@ -74,7 +73,7 @@ const Header = (props) => {
           <IconButton to="#" component={RouterLink}>
             <SearchIcon />
           </IconButton>
-          <Badge badgeContent={basketSize} color="primary">
+          <Badge badgeContent={basketSize} color="secondary">
             <IconButton to="/checkout" component={RouterLink} >
               <ShoppingCartIcon/>
             </IconButton>

@@ -120,7 +120,6 @@ const Orders = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log(authContext);
       try {
         let data = await getOrders(authContext);
         let rows = data.map(order => {

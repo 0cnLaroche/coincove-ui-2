@@ -7,9 +7,10 @@ import {
     CardContent,
     CardMedia,
     CardActions,
+    CardActionArea,
     Button,
     makeStyles } from '@material-ui/core';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { fetchItemList } from '../../api';
 
 
@@ -45,6 +46,10 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
+function ccyFormat(num) {
+    return `${num.toFixed(2)}`;
+}
+
 const Home = ({handleBasketItemAdded}) => {
     const classes = useStyles();
     const [ items, setItems] = useState([]);
@@ -65,24 +70,23 @@ const Home = ({handleBasketItemAdded}) => {
             {items.map((item, i) => (
               <Grid item key={i} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
-                  <CardMedia
-                    className={classes.cardMedia}
-                    image={item.imageUrl}
-                    title="Image title"
-                  />
+                  <CardActionArea component={RouterLink} to={`/items/${item._id}`}>
+                    <CardMedia
+                      className={classes.cardMedia}
+                      image={item.imageUrl}
+                      title="Item image"
+                    />
+                  </CardActionArea>
                   <CardContent className={classes.cardContent}>
                     <Typography gutterBottom variant="h5" component="h2">
                       {item.name}
                     </Typography>
                     <Typography>
-                      {item.producer}
+                      $ {ccyFormat(item.price)}
                     </Typography>
                   </CardContent>
                   <CardActions>
-                    <Button to={`/items/${item._id}`} size="small" color="primary" component={Link}>
-                      View
-                    </Button>
-                    <Button size="small" color="primary" onClick={(e) => handleBasketItemAdded(item)}>
+                    <Button size="small" variant="contained" color="secondary" onClick={(e) => handleBasketItemAdded(item)}>
                       Add to cart
                     </Button>
                   </CardActions>

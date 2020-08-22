@@ -1,56 +1,25 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import scriptLoader from "react-async-script-loader";
-import {CircularProgress, Container } from '@material-ui/core';
+import {CircularProgress, Grid, TextField, Typography } from '@material-ui/core';
 import { postOrder } from '../../api';
 
 const CLIENT_ID = process.env.REACT_APP_PAYPAL_CLIENT_ID;
 
 let PayPalButton = null;
-class PaypalButton extends React.Component {
-  constructor(props) {
-    super(props);
 
-    this.state = {
-      showButtons: false,
-      loading: true,
-      paid: false
-    };
-    this.order = props.order;
-    //this.paymentAmount = props.invoiceTotal;
+const PaypalButton = ({isScriptLoaded, isScriptLoadSucceed, order, handleOnApproved, defaultEmail, handleEmailChange}) => {
+  const [showButtons, setShowButtons] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [paid, setPaid] = useState(false);
+  const [emailIsError, setEmailIsError] = useState(false);
+  const emailRef = useRef();
 
-    window.React = React;
-    window.ReactDOM = ReactDOM;
-  }
+  window.React = React;
+  window.ReactDOM = ReactDOM;
 
-  componentDidMount() {
-    const { isScriptLoaded, isScriptLoadSucceed } = this.props;
-    //const classes = useStyles();
-
-    if (isScriptLoaded && isScriptLoadSucceed) {
-      PayPalButton = window.paypal.Buttons.driver("react", { React, ReactDOM });
-      this.setState({ loading: false, showButtons: true });
-    }
-  }
-
-  static getDerivedStateFromProps(nextProps, prevState) {
-    const { isScriptLoaded, isScriptLoadSucceed } = nextProps;
-
-    const scriptJustLoaded =
-      !prevState.showButtons && isScriptLoaded;
-
-    if (scriptJustLoaded && isScriptLoadSucceed) {
-      console.log("paypal sdk script Loaded")
-        PayPalButton = window.paypal.Buttons.driver("react", {
-          React,
-          ReactDOM
-        });
-        return { loading: false, showButtons: true, paid: false };
-    }
-    return null;
-  }
-  createOrder = (data, actions) => {
-    const { total, items } = this.order;
+  const createOrder = (data, actions) => {
+    const { total, items } = order;
     console.log("Creating Order");
     return actions.order.create({
       purchase_units: [
@@ -68,7 +37,8 @@ class PaypalButton extends React.Component {
     });
   };
 
-  onApprove = (data, actions) => {
+  const onApprove = (data, actions) => {
+    const {total, subtotal, shipping, items, shippingAddress} = order;
     actions.order.capture().then(details => {
       const captureId = details.purchase_units[0].payments.captures[0].id;
       const paymentData = {
@@ -76,12 +46,11 @@ class PaypalButton extends React.Component {
         orderId: data.orderID,
         captureId: captureId
       };
-
-      const {total, subtotal, shipping, items} = this.order;
+      //console.log(paymentData);
       const {address_line_1, address_line_2, admin_area_1, admin_area_2, 
         country_code, postal_code } = details.purchase_units[0].shipping.address;
 
-      const shippingAddress = {
+      const billingAddress = {
         address1: address_line_1,
         address2: address_line_2,
         city: admin_area_1,
@@ -102,34 +71,82 @@ class PaypalButton extends React.Component {
 
       let order = {
         shippingAddress,
-        billingAddress: shippingAddress,
+        billingAddress,
         orderLines,
         total,
         subtotal,
         shipping,
-        paymentId: captureId
+        paymentId: captureId,
+        paypalOrderId: data.orderID,
+        email: emailRef.current.value
       }
-      console.log(order);
       postOrder(order);
-      console.log("Payment Approved: ", paymentData);
-      this.setState({ showButtons: false, paid: true });
-      this.props.handleOnApproved();
+      console.debug(order)
+      console.info("Payment Approved: ", paymentData);
+      handleOnApproved();
+      setShowButtons(false);
+      setPaid(true);
     });
   };
 
-  render() {
-    const { showButtons, loading, paid } = this.state;
-    return (
-      <Container>
+  const handleOnChange = (event) => {
+    let email = event.target.value;
+    if(/\S+@\S+\.\S+/.test(email)) {
+      setEmailIsError(false);
+      setShowButtons(true);
+    } else {
+      console.error("Email is invalid")
+      setEmailIsError(true);
+      setShowButtons(false);
+    }
+    handleEmailChange(email)
+  }
+
+  useEffect(()=> {
+
+    if(isScriptLoaded && isScriptLoadSucceed && !showButtons) {
+      console.info("paypal sdk script Loaded")
+      PayPalButton = window.paypal.Buttons.driver("react", {
+        React,
+        ReactDOM
+      });
+      setLoading(false);
+      //setShowButtons(true);
+    }
+  },[isScriptLoaded, isScriptLoadSucceed]);
+
+  return (
+      <Grid container orientation="column" spacing={6}>
         {loading && <CircularProgress />}
+        {!loading && (
+          <Grid item xs={12}>
+          <Typography>
+            Please enter a valid email address to send you your order confirmation
+          </Typography>
+            <TextField
+              required
+              type="email"
+              id="email"
+              name="email"
+              label="email"
+              defaultValue={defaultEmail}
+              inputRef={emailRef}
+              error={emailIsError}
+              helperText={emailIsError ? "Email address is invalid": null}
+              fullWidth
+              autoComplete="email"
+              onChange={handleOnChange}
+            />
+          </Grid>
+        )}
 
         {showButtons && (
-          <div>
+          <Grid item xs={12}>
             <PayPalButton
-              createOrder={(data, actions) => this.createOrder(data, actions)}
-              onApprove={(data, actions) => this.onApprove(data, actions)}
+              createOrder={(data, actions) => createOrder(data, actions)}
+              onApprove={(data, actions) => onApprove(data, actions)}
             />
-          </div>
+          </Grid>
         )}
 
         {paid && (
@@ -137,9 +154,8 @@ class PaypalButton extends React.Component {
             paid thank you!
           </div>
         )}
-      </Container>
+      </Grid>
     );
   }
-}
 
 export default scriptLoader(`https://www.paypal.com/sdk/js?currency=CAD&client-id=${CLIENT_ID}`)(PaypalButton);

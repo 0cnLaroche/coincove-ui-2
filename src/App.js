@@ -68,7 +68,7 @@ class App extends React.Component {
                             <ItemDetail handleBasketItemAdded={this.handleBasketItemAdded}/>
                         </Route>
                         <Route path="/checkout">
-                            <Checkout basket={this.state.basket} />
+                            <Checkout basket={this.state.basket} handleBasketUpdate={this.handleBasketUpdate} />
                         </Route> 
                         <PrivateRoute path="/manager" component={Manager}/>
                     </Switch>

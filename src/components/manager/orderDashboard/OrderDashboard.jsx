@@ -13,7 +13,7 @@ import {
     DialogContentText, 
     DialogTitle  } from '@material-ui/core';
 
-import { getOrder } from '../../../api'
+import { getOrder, patchOrder } from '../../../api'
 import OrderDetail from './OrderDetail';
 import Address from './Address';
 import status from './Status';
@@ -23,8 +23,8 @@ const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1
     },
-    toolbar: {
-
+    buttons: {
+        marginBottom: theme.spacing(3)
     }
 }));
 
@@ -48,12 +48,20 @@ const OrderDashboard = () => {
     const handleCloseShippingDialog = () => {
         setShippingDialogOpen(false);
     }
-    const handleSubmitShipping = () => {
-        order.trackingId = trackingIdFieldRef.current.value;
-        order.status = status.SHIPPED;
-        order.updated = Date.now();
-        setOrder(order);
-        setShippingDialogOpen(false);
+    const handleOnSubmitShipping = () => {
+        let patch = {
+            trackingId: trackingIdFieldRef.current.value,
+            status: status.SHIPPED,
+            updated: Date.now()
+        }
+        patchOrder(order._id, patch, authContext)
+        .then((patchedOrder) => {
+            setOrder(patchedOrder);
+            setShippingDialogOpen(false);
+        })
+        .catch(err => {
+            alert("Could not update order")
+        })
     }
 
     useEffect(()=> {
@@ -82,10 +90,10 @@ const OrderDashboard = () => {
 
     return (
         <div className={classes.root}>
-            <ButtonGroup color="primary" aria-label="outlined primary button group">
+            <ButtonGroup color="primary" className={classes.buttons} aria-label="outlined primary button group">
                 <Button onClick={handleClickOpenShippingDialog}>Ship</Button>
                 <Button>Refund</Button>
-                <Button color="secondary">Cancel</Button>
+                <Button color="secondary">Cancel order</Button>
             </ButtonGroup>
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={8} direction="column" container spacing={1}>
@@ -117,6 +125,10 @@ const OrderDashboard = () => {
                 <Grid item xs={12} sm={8}>
                    <OrderDetail order={order}/>
                 </Grid>
+                <Grid item xs={12} sm={4}>
+                    <Typography variant="h6">Client email</Typography>
+                    <Typography>{order.email}</Typography>
+                </Grid>
             </Grid>
             <Dialog open={shippingDialogOpen} onClose={handleCloseShippingDialog} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Submit Shipping Information</DialogTitle>
@@ -130,7 +142,7 @@ const OrderDashboard = () => {
                     <Button onClick={handleCloseShippingDialog} color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={handleSubmitShipping} color="primary">
+                    <Button onClick={handleOnSubmitShipping} color="primary">
                         Submit
                     </Button>
                 </DialogActions>
