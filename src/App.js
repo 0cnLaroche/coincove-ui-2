@@ -19,17 +19,14 @@ class App extends React.Component {
         super(props);
 
         this.state = {
-            basket:{
-                items:[]
-            },
-            basketSize: 0,
+            basket:[],
             user: null,
             // Loading existing tokens
             authentication: JSON.parse(localStorage.getItem("authentication_storage")),
             currentItem: null
         }
         this.handleBasketItemAdded = this.handleBasketItemAdded.bind(this);
-        this.handleBasketUpdate = this.handleBasketItemAdded.bind(this);
+        this.handleBasketUpdate = this.handleBasketUpdate.bind(this);
         this.setAuthentication = this.setAuthentication.bind(this);
         this.setCurrentItem = this.setCurrentItem.bind(this);
     }
@@ -42,11 +39,12 @@ class App extends React.Component {
         this.setState({currentItem:item});
     }
     handleBasketItemAdded(item) {
-        this.state.basket.items.push(item);
-        this.setState({basketSize : this.state.basketSize + 1});
+        item.units = 1;
+        this.state.basket.push(item);
+        this.setState({basket : this.state.basket});
     }
     handleBasketUpdate(newBasket) {
-        this.setState({basket: newBasket});
+        this.setState({basket: newBasket})
     }
     render() {
         return (
@@ -55,7 +53,7 @@ class App extends React.Component {
             <Router>
                 <CssBaseline />
                 <Container maxWidth="lg">
-                    <Header title={title} basketSize={this.state.basketSize} sections={sections}/>
+                    <Header title={title} basketSize={this.state.basket.length} sections={sections}/>
                     <main>
                     <Switch>
                         <Route path="/" exact>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import scriptLoader from "react-async-script-loader";
-import {CircularProgress, Grid, TextField, Typography } from '@material-ui/core';
+import {CircularProgress, Grid, Container, TextField, Typography } from '@material-ui/core';
 import { postOrder } from '../../api';
 
 const CLIENT_ID = process.env.REACT_APP_PAYPAL_CLIENT_ID;
@@ -63,7 +63,7 @@ const PaypalButton = ({isScriptLoaded, isScriptLoadSucceed, order, handleOnAppro
         return {
           description: item.name, 
           itemId: item._id, 
-          units: 1, 
+          units: item.units, 
           price: item.price, 
           discount: item.discount
         }
@@ -116,45 +116,47 @@ const PaypalButton = ({isScriptLoaded, isScriptLoadSucceed, order, handleOnAppro
   },[isScriptLoaded, isScriptLoadSucceed]);
 
   return (
-      <Grid container orientation="column" spacing={6}>
-        {loading && <CircularProgress />}
-        {!loading && (
-          <Grid item xs={12}>
-          <Typography>
-            Please enter a valid email address to send you your order confirmation
-          </Typography>
-            <TextField
-              required
-              type="email"
-              id="email"
-              name="email"
-              label="email"
-              defaultValue={defaultEmail}
-              inputRef={emailRef}
-              error={emailIsError}
-              helperText={emailIsError ? "Email address is invalid": null}
-              fullWidth
-              autoComplete="email"
-              onChange={handleOnChange}
-            />
-          </Grid>
-        )}
+      <Container maxWidth="sm">
+        <Grid container orientation="column" spacing={6}>
+          {loading && <CircularProgress />}
+          {!loading && (
+            <Grid item xs={12}>
+            <Typography>
+              Please enter a valid email address to send you your order confirmation
+            </Typography>
+              <TextField
+                required
+                type="email"
+                id="email"
+                name="email"
+                label="email"
+                defaultValue={defaultEmail}
+                inputRef={emailRef}
+                error={emailIsError}
+                helperText={emailIsError ? "Email address is invalid": null}
+                fullWidth
+                autoComplete="email"
+                onChange={handleOnChange}
+              />
+            </Grid>
+          )}
 
-        {showButtons && (
-          <Grid item xs={12}>
-            <PayPalButton
-              createOrder={(data, actions) => createOrder(data, actions)}
-              onApprove={(data, actions) => onApprove(data, actions)}
-            />
-          </Grid>
-        )}
+          {showButtons && (
+            <Grid item xs={12}>
+              <PayPalButton
+                createOrder={(data, actions) => createOrder(data, actions)}
+                onApprove={(data, actions) => onApprove(data, actions)}
+              />
+            </Grid>
+          )}
 
-        {paid && (
-          <div>
-            paid thank you!
-          </div>
-        )}
-      </Grid>
+          {paid && (
+            <div>
+              paid thank you!
+            </div>
+          )}
+        </Grid>
+      </Container>
     );
   }
 

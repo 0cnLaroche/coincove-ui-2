@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import Container from '@material-ui/core/Container'
 
 export default class AddressForm extends React.Component {
     constructor(props) {
@@ -71,7 +72,7 @@ export default class AddressForm extends React.Component {
     render() {
       const { errors } = this.state;
         return (
-    <React.Fragment>
+    <Container maxWidth="sm">
       <Typography variant="h6" gutterBottom>
         Shipping address
       </Typography>
@@ -186,7 +187,7 @@ export default class AddressForm extends React.Component {
             }
         </Grid>
       </Grid>
-    </React.Fragment>
+    </Container>
         )
     }
 }

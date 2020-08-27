@@ -2,46 +2,58 @@ import React, {useState} from 'react';
 import styles from './Checkout.module.css';
 import {TableContainer, Table, TableHead, TableRow, TableCell, TableBody} from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
+import Item from './Item';
 
 function ccyFormat(num) {
     return `${num.toFixed(2)}`;
 }
 
-const OrderReview = ({rows, invoiceTotal, invoiceSubtotal, invoiceShipping}) => {
-    return (
+const OrderReview = ({items, invoiceTotal, invoiceSubtotal, invoiceShipping, handleBasketUpdate}) => {
+    
+  const handleIncrement = (key) => {
+    console.log(key)
+    items[key].units = items[key].units + 1;
+    handleBasketUpdate(items)
+  }
+  const handleDecrement = (key) => {
+    if (items[key].units > 1) {
+      items[key].units = items[key].units - 1;
+      handleBasketUpdate(items);
+    }
+  }
+  const handleRemove = (key) => {
+    items.splice(key, 1);
+    handleBasketUpdate(items);
+  }
+  
+  return (
         <TableContainer component={Paper}>
         <Table className={styles.table} aria-label="spanning table">
           <TableHead>
             <TableRow>
               <TableCell align="center" colSpan={3}>
-                Details
+                Order Details
               </TableCell>
-              <TableCell align="right">Price</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Desc</TableCell>
-              <TableCell align="right">Qty.</TableCell>
-              <TableCell align="right">Unit</TableCell>
-              <TableCell align="right">Sum</TableCell>
+              <TableCell align="right" colSpan={1}>
+                Price
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row, i) => (
-              <TableRow key={i}>
-                <TableCell>{row.desc}</TableCell>
-                <TableCell align="right">{row.qty}</TableCell>
-                <TableCell align="right">{ccyFormat(row.unit)}</TableCell>
-                <TableCell align="right">{ccyFormat(row.price)}</TableCell>
+            {items.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell colSpan={4}>
+                  <Item item={item} basketIndex={index} handleIncrement={handleIncrement} handleDecrement={handleDecrement} handleRemove={handleRemove}/>
+                </TableCell>
               </TableRow>
             ))}
-
             <TableRow>
-              <TableCell rowSpan={3} />
-              <TableCell colSpan={2}>Subtotal</TableCell>
+              <TableCell rowSpan={3} colSpan={2}/>
+              <TableCell>Subtotal</TableCell>
               <TableCell align="right">{ccyFormat(invoiceSubtotal)}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell colSpan={2}>Shipping</TableCell>
+              <TableCell>Shipping</TableCell>
               <TableCell align="right">{ccyFormat(invoiceShipping)}</TableCell>
             </TableRow>
             {/*<TableRow>
@@ -50,7 +62,7 @@ const OrderReview = ({rows, invoiceTotal, invoiceSubtotal, invoiceShipping}) => 
               <TableCell align="right">{ccyFormat(invoiceTaxes)}</TableCell>
             </TableRow>*/}
             <TableRow>
-              <TableCell colSpan={2}>Total</TableCell>
+              <TableCell>Total</TableCell>
               <TableCell align="right">$ {ccyFormat(invoiceTotal)}</TableCell>
             </TableRow>
           </TableBody>

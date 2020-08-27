@@ -26,7 +26,8 @@ const useStyles = makeStyles(theme => ({
     marginLeft: theme.spacing(1)
   },
   stepper: {
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
+    maxWidth:"sm"
   }
 }))
 
@@ -74,17 +75,16 @@ const Checkout = ({basket, handleBasketUpdate}) => {
     const [isValidationError, setIsValidationError] = useState(true);
     const [email, setEmail] = useState();
     const errors = [];
-    const rows = basket.items.map((item) => createRow(item.name, 1, item.price));
+    const rows = basket.map((item) => createRow(item.name, item.units, item.price));
     const invoiceSubtotal = subtotal(rows);
-    //const invoiceTaxes = TAX_RATE * invoiceSubtotal;
+    const invoiceTaxes = TAX_RATE * invoiceSubtotal; // Not used at the moment
     const invoiceShipping = shipping(invoiceSubtotal);
     const invoiceTotal = invoiceShipping + invoiceSubtotal;
     
     const handleOnApproved = () => {
       setOpenApprovedDialog(true);
-      basket.items = [];
-      basket.basketSize = 0;
-      //handleBasketUpdate(basket);
+      basket = [];
+      handleBasketUpdate(basket);
     }
     const handleCloseApprovedDialog = () => {
       setOpenApprovedDialog(false);
@@ -93,6 +93,8 @@ const Checkout = ({basket, handleBasketUpdate}) => {
     const handleNext = () => {
       if(!(activeStep === 1 && isValidationError)) {
         setActiveStep(activeStep + 1);
+      } else {
+        alert("Please complete shipping information")
       }
     }
     const handleBack = () => {
@@ -109,25 +111,26 @@ const Checkout = ({basket, handleBasketUpdate}) => {
     const handleEmailChange = (newEmail) => {
       setEmail(email);
     }
+
     const getStepContent = (step) => {
       switch(step) {
         case 0:
-          return <OrderReview rows={rows} invoiceTotal={invoiceTotal} invoiceSubtotal={invoiceSubtotal} invoiceShipping={invoiceShipping}/>;
+          return <OrderReview items={basket} invoiceTotal={invoiceTotal} invoiceSubtotal={invoiceSubtotal} invoiceShipping={invoiceShipping} handleBasketUpdate={handleBasketUpdate}/>;
         case 1:
           return <AddressForm handleAddressChange={handleAddressChange} defaultValue={shippingAddress}/>;
         case 2:
           return (
           <PaypalButton 
-            handleOnApproved={handleOnApproved} 
+            handleOnApproved={handleOnApproved}
+            handleEmailChange={handleEmailChange}
             order={{
-              items: basket.items,
+              items: basket,
               total: invoiceTotal,
               shipping: invoiceShipping,
               subtotal: invoiceSubtotal,
               shippingAddress,
               email
             }}
-            handleEmailChange={handleEmailChange}
             defaultEmail={email}
           />);
         default:
@@ -137,7 +140,7 @@ const Checkout = ({basket, handleBasketUpdate}) => {
 
     return (
       <div>
-        <Container component="main" maxWidth="sm">
+        <Container component="main" maxWidth="md">
           <Typography component="h1" variant="h4" align="center">Checkout</Typography>
           <Stepper activeStep={activeStep} className={classes.stepper}>
             {steps.map(label => (
@@ -159,7 +162,7 @@ const Checkout = ({basket, handleBasketUpdate}) => {
                     className={classes.button}
                     onClick={handleNext}>
                       Next
-                    </Button>
+                  </Button>
                 )}
               </div>
           </React.Fragment>
