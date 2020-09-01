@@ -38,10 +38,10 @@ const Item = ({basketIndex: key, item, handleIncrement, handleDecrement, handleR
                     </Hidden>
                     <Grid item xs>
                         <ButtonGroup size="small">
-                            <Button onClick={ e => handleDecrement(key) }>-</Button>
+                            <Button onClick={ e => handleDecrement(key) } disabled={item.units <= 1}>-</Button>
                             <Button disableRipple disableFocusRipple>{item.units}</Button>
-                            <Button onClick={ e => handleIncrement(key) }>+</Button>
-                        </ButtonGroup>
+                            <Button onClick={ e => handleIncrement(key) } disabled={item.units >= item.inventory}>+</Button>
+                        </ButtonGroup>  
                     </Grid>
                     <Grid item xs>
                         <Typography align="right" display="inline" variant="subtitle1">$ {lineAmount(item.units, item.price)}</Typography>
