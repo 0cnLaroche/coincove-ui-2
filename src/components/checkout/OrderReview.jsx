@@ -11,7 +11,6 @@ function ccyFormat(num) {
 const OrderReview = ({items, invoiceTotal, invoiceSubtotal, invoiceShipping, handleBasketUpdate}) => {
     
   const handleIncrement = (key) => {
-    console.log(key)
     items[key].units = items[key].units + 1;
     handleBasketUpdate(items)
   }
@@ -23,6 +22,10 @@ const OrderReview = ({items, invoiceTotal, invoiceSubtotal, invoiceShipping, han
   }
   const handleRemove = (key) => {
     items.splice(key, 1);
+    handleBasketUpdate(items);
+  }
+  const handleOptionChange = (itemKey, optionKey, event) => {
+    items[itemKey].options[optionKey].value = event.target.value;
     handleBasketUpdate(items);
   }
   
@@ -43,7 +46,7 @@ const OrderReview = ({items, invoiceTotal, invoiceSubtotal, invoiceShipping, han
             {items.map((item, index) => (
               <TableRow key={index}>
                 <TableCell colSpan={4}>
-                  <Item item={item} basketIndex={index} handleIncrement={handleIncrement} handleDecrement={handleDecrement} handleRemove={handleRemove}/>
+                  <Item item={item} basketIndex={index} handleIncrement={handleIncrement} handleDecrement={handleDecrement} handleRemove={handleRemove} handleOptionChange={handleOptionChange}/>
                 </TableCell>
               </TableRow>
             ))}

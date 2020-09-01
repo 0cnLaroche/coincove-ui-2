@@ -17,15 +17,33 @@ function ccyFormat(num) {
 function priceRow(qty, unit) {
   return qty * unit;
 }
-
-function createRow(desc, qty, unit) {
+/** 
+ * Formats options array into string, each option seperated by
+ * return char
+ * @param options array of option
+ * @returns options formatted as string
+ * */
+function optionsFormat(options) {
+  let optionsStrArray = options.map(option => option.name + ": " + option.value)
+  return optionsStrArray.join("\n")
+}
+/** 
+ * Creates formatted row elements
+ * @param desc item description
+ * @param options item options
+ * @param qty quantity of same item in the order
+ * @param unit item unit price
+ * @returns formatted fields
+ */
+function createRow(desc, options, qty, unit) {
   const price = priceRow(qty, unit);
-  return {desc, qty, unit, price};
+  return {desc, qty, options: optionsFormat(options), unit, price};
 }
 
+/** Displays order details, marchant view */
 const OrderDetail = ({order}) => {
     const { orderLines, taxes, shipping, subtotal, total } = order; 
-    const rows = orderLines.map((line) => createRow(line.description, line.units, line.price));
+    const rows = orderLines.map((line) => createRow(line.description, line.options, line.units, line.price));
 
     return (
         <TableContainer component={Paper}>
@@ -39,6 +57,7 @@ const OrderDetail = ({order}) => {
               </TableRow>
               <TableRow>
                 <TableCell>Desc</TableCell>
+                <TableCell>Options</TableCell>
                 <TableCell align="right">Qty.</TableCell>
                 <TableCell align="right">Unit</TableCell>
                 <TableCell align="right">Sum</TableCell>
@@ -48,6 +67,7 @@ const OrderDetail = ({order}) => {
               {rows.map((row, i) => (
                 <TableRow key={i}>
                   <TableCell>{row.desc}</TableCell>
+                  <TableCell>{row.options}</TableCell>
                   <TableCell align="right">{row.qty}</TableCell>
                   <TableCell align="right">{ccyFormat(row.unit)}</TableCell>
                   <TableCell align="right">{ccyFormat(row.price)}</TableCell>
@@ -55,7 +75,7 @@ const OrderDetail = ({order}) => {
               ))}
 
               <TableRow>
-                <TableCell rowSpan={3} />
+                <TableCell rowSpan={3} colSpan={2}/>
                 <TableCell colSpan={2}>Subtotal</TableCell>
                 <TableCell align="right">{ccyFormat(subtotal)}</TableCell>
               </TableRow>

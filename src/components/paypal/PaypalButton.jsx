@@ -8,10 +8,11 @@ const CLIENT_ID = process.env.REACT_APP_PAYPAL_CLIENT_ID;
 
 let PayPalButton = null;
 
-const PaypalButton = ({isScriptLoaded, isScriptLoadSucceed, order, handleOnApproved, defaultEmail, handleEmailChange}) => {
+const PaypalButton = ({isScriptLoaded, isScriptLoadSucceed, statement, handleOnApproved, defaultEmail, handleEmailChange}) => {
   const [showButtons, setShowButtons] = useState(false);
   const [loading, setLoading] = useState(true);
   const [paid, setPaid] = useState(false);
+  const [paymentIsError, setPaymentIsError] = useState(false);
   const [emailIsError, setEmailIsError] = useState(false);
   const emailRef = useRef();
 
@@ -19,7 +20,7 @@ const PaypalButton = ({isScriptLoaded, isScriptLoadSucceed, order, handleOnAppro
   window.ReactDOM = ReactDOM;
 
   const createOrder = (data, actions) => {
-    const { total, items } = order;
+    const { total, items } = statement;
     console.log("Creating Order");
     return actions.order.create({
       purchase_units: [
@@ -38,14 +39,36 @@ const PaypalButton = ({isScriptLoaded, isScriptLoadSucceed, order, handleOnAppro
   };
 
   const onApprove = (data, actions) => {
-    const {total, subtotal, shipping, items, shippingAddress} = order;
+    const {total, subtotal, shipping, items, shippingAddress} = statement;
+    const paymentData = {
+      payerId: data.payerID,
+      orderId: data.orderID
+    };
+    const orderLines = items.map( item => {
+      return {
+        description: item.name, 
+        itemId: item._id, 
+        units: item.units, 
+        price: item.price, 
+        discount: item.discount,
+        options: item.options
+      }
+    });
+    const order = {
+      shippingAddress,
+      billingAddress: null, 
+      orderLines,
+      total,
+      subtotal,
+      shipping,
+      paymentId: null,
+      paypalOrderId: data.orderID,
+      email: emailRef.current.value
+    }
+
     actions.order.capture().then(details => {
       const captureId = details.purchase_units[0].payments.captures[0].id;
-      const paymentData = {
-        payerId: data.payerID,
-        orderId: data.orderID,
-        captureId: captureId
-      };
+      order.paymentId = captureId;
       //console.log(paymentData);
       const {address_line_1, address_line_2, admin_area_1, admin_area_2, 
         country_code, postal_code } = details.purchase_units[0].shipping.address;
@@ -59,33 +82,18 @@ const PaypalButton = ({isScriptLoaded, isScriptLoadSucceed, order, handleOnAppro
         postalCode: postal_code
       }
 
-      const orderLines = items.map( item => {
-        return {
-          description: item.name, 
-          itemId: item._id, 
-          units: item.units, 
-          price: item.price, 
-          discount: item.discount
-        }
-      })
+      order.billingAddress = billingAddress;
 
-      let order = {
-        shippingAddress,
-        billingAddress,
-        orderLines,
-        total,
-        subtotal,
-        shipping,
-        paymentId: captureId,
-        paypalOrderId: data.orderID,
-        email: emailRef.current.value
-      }
       postOrder(order);
-      console.debug(order)
+      console.debug(order);
       console.info("Payment Approved: ", paymentData);
       handleOnApproved();
       setShowButtons(false);
       setPaid(true);
+    })
+    .catch(error => {
+      setPaymentIsError(true);
+      alert("There was an error while processing your payment. Your order will not be submitted")
     });
   };
 

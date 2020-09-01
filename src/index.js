@@ -4,8 +4,6 @@ import App from './App'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import styles from  './theme';
 
-console.log(styles)
-
 const theme = createMuiTheme(styles);
 
 ReactDOM.render(

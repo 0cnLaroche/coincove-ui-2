@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../../../context/auth';
+import ImportedImage from '../ImportedImage';
 import { useParams, Redirect } from 'react-router-dom';
 import Compressor from 'compressorjs';
 import {
@@ -34,20 +35,8 @@ const useStyles = makeStyles((theme) => ({
   },
   input: {
     display: 'none',
-  },
+  }
 }));
-
-// Creates 
-const ImportedImage = (props) => {
-  const { dataUrl } = props;
-  return (
-    <div>
-      {dataUrl ?
-        <img src={dataUrl} alt="user imported" id="imported" />
-        : <p>no file selected</p>
-      }
-    </div>
-  )}
 
 const ItemCreator = (props) => {
   const classes = useStyles();
@@ -59,39 +48,73 @@ const ItemCreator = (props) => {
   const [itemName, setItemName] = useState();
   const [itemCreator, setItemCreator] = useState();
   const [itemDetail, setItemDetail] = useState();
+  const [itemOptions, setItemOptions] = useState();
+  const [itemInventory, setItemInventory] = useState(1);
   const [itemPrice, setItemPrice] = useState();
   const { authContext } = useAuthContext();
 
   const fetchData = async (id) => {
     const item = await fetchItem(id);
+    // FIXME This triggers rerendering for every fields
     setItemName(item.name);
     setItemCreator(item.producer);
     setItemDetail(item.description);
+    setItemOptions(JSON.stringify(item.options, 1))
     setItemPrice(item.price);
     setImgDataUrl(item.imageUrl);
 }
   
-
   useEffect(() => {
     if( itemId !== undefined ) {
       fetchData(itemId);
     }
   }, [itemId]);
 
-  const onFileChange = event => {
+  const onFileChange = (event) => {
     var file = event.target.files[0];
     setSelectedFile(file);
 
     var reader = new FileReader();
     reader.onload = () => {
       var dataUrl = reader.result;
-      console.log(dataUrl);
       setImgDataUrl(dataUrl);
     }
     reader.readAsDataURL(file);
   }
+
+  const validateOptions = () => {
+    let isValid = false;
+    let options = JSON.parse(itemOptions);
+    if(options instanceof Array) {
+      isValid = true;
+      for (let option of options) {
+        if(!(option.name && option.choices && option.choices instanceof Array)) {
+          isValid = false;
+        }
+      }
+    }
+    if(!isValid) {
+      alert("Options are have invalid format.\n Options must be in format:\n [\n{\n'name':'ENTER OPTION NAME HERE',\n 'choices': ['choice1','choice2','etc...']\n}]");
+    }
+    return isValid;
+  }
+  const validateForm = () => {
+    if (itemName && itemPrice && itemInventory && validateOptions()) {
+      setIsError(false);
+      return true;
+    }
+    setIsError(true);
+    return false;
+  }
   
   const onItemSubmit = async () => {
+
+    validateForm();
+    if (isError) {
+      alert("Validate errors please review");
+      return;
+    }
+
     var imageUrl = "###";
     if (selectedFile) {
       const formData = new FormData();
@@ -106,8 +129,9 @@ const ItemCreator = (props) => {
       producer: itemCreator,
       description: itemDetail,
       imageUrl: imageUrl,
-      inventory: 1,
-      price: Number(itemPrice)
+      inventory: itemInventory,
+      price: Number(itemPrice),
+      options: JSON.parse(itemOptions)
     }
     //console.log(item);
     item = await postItem(item, authContext);
@@ -147,7 +171,6 @@ const ItemCreator = (props) => {
                 onChange={e => setItemCreator(e.target.value)}
                 name="itemCreator"
                 variant="outlined"
-                required
                 fullWidth
                 id="itemCreator"
                 label="Creator"
@@ -160,10 +183,40 @@ const ItemCreator = (props) => {
                 onChange={e => setItemDetail(e.target.value)}
                 name="itemDetail"
                 variant="outlined"
+                required
                 multiline
+                rows={3}
                 fullWidth
                 id="itemDetail"
                 label="Details"
+                autoFocus
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                value={itemOptions}
+                onChange={e => setItemOptions(e.target.value)}
+                name="itemOptions"
+                variant="outlined"
+                multiline
+                rows={3}
+                fullWidth
+                id="itemOptions"
+                label="Options"
+                autoFocus
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                value={itemInventory}
+                onChange={e => setItemInventory(e.target.value)}
+                type="number"
+                name="itemInventory"
+                variant="outlined"
+                required
+                fullWidth
+                id="itemInventory"
+                label="Inventory"
                 autoFocus
               />
             </Grid>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuthContext } from '../../../context/auth';
 import { useItemContext } from '../../../context/item';
+import ImportedImage from '../ImportedImage';
 import { useParams, Redirect } from 'react-router-dom';
 import {
   Container,
@@ -37,18 +38,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-// Creates 
-const ImportedImage = (props) => {
-  const { dataUrl } = props;
-  return (
-    <div>
-      {dataUrl ?
-        <img src={dataUrl} alt="user imported" id="imported" />
-        : <p>no file selected</p>
-      }
-    </div>
-  )}
-
 const ItemUpdate = (props) => {
   const classes = useStyles();
   const [isUpdated, setIsUpdated] = useState(false);
@@ -57,20 +46,24 @@ const ItemUpdate = (props) => {
   const [selectedFile, setSelectedFile] = useState();
   const { id: itemId } = useParams();
   const [imgDataUrl, setImgDataUrl] = useState();
-  const nameTextField = useRef(null);
-  const producerTextField = useRef(null);
-  const detailsTextField = useRef(null);
-  const priceTextField = useRef(null);
+  const nameRef = useRef(null);
+  const producerRef = useRef(null);
+  const detailsRef = useRef(null);
+  const priceRef = useRef(null);
+  const inventoryRef = useRef(null);
+  const optionsRef = useRef(null);
   const { authContext } = useAuthContext();
 
   const fetchData = async (id) => {
     const item = await fetchItem(id);
     if(item) {
       setImgDataUrl(item.imageUrl);
-      nameTextField.current.value = item.name;
-      producerTextField.current.value = item.producer;
-      detailsTextField.current.value = item.description;
-      priceTextField.current.value = item.price;
+      nameRef.current.value = item.name;
+      producerRef.current.value = item.producer;
+      detailsRef.current.value = item.description;
+      optionsRef.current.value = JSON.stringify(item.options.map(option => { return {name: option.name, choices: option.choices}}));
+      inventoryRef.current.value = item.inventory;
+      priceRef.current.value = item.price;
     } else {
       setIsError(true);
     }
@@ -96,26 +89,60 @@ const ItemUpdate = (props) => {
     }
     reader.readAsDataURL(file);
   }
+
+  const validateOptions = () => {
+    let isValid = false;
+    let options = JSON.parse(optionsRef.current.value);
+    if(options instanceof Array) {
+      isValid = true;
+      for (let option of options) {
+        if(!(option.name && option.choices && option.choices instanceof Array)) {
+          isValid = false;
+        }
+      }
+    }
+    if(!isValid) {
+      alert("Options are have invalid format.\n Options must be in format:\n [\n{\n'name':'ENTER OPTION NAME HERE',\n 'choices': ['choice1','choice2','etc...']\n}]");
+    }
+    return isValid;
+  }
+
+  const validateForm = () => {
+    if (nameRef.current.value && priceRef.current.value && inventoryRef.current.value && validateOptions()) {
+      setIsError(false);
+      return true;
+    }
+    setIsError(true);
+    return false;
+  }
   
   const onItemSubmit = async () => {
-    var imageUrl = "###";
+
+    validateForm();
+    if (isError) {
+      alert("Validation errors, please review elements");
+      return;
+    }
+
+    let imageUrl = "###";
     if (selectedFile) {
       const formData = new FormData();
       formData.append("picture",
         selectedFile,
         selectedFile.name);
-      var { url } = await postImage(formData, authContext);
+      let { url } = await postImage(formData, authContext);
       imageUrl = url;
     } else {
       imageUrl = imgDataUrl;
     }
-    var item = {
-      name: nameTextField.current.value,
-      producer: producerTextField.current.value,
-      description: detailsTextField.current.value,
+    let item = {
+      name: nameRef.current.value,
+      producer: producerRef.current.value,
+      description: detailsRef.current.value,
+      options: JSON.parse(optionsRef.current.value),
       imageUrl: imageUrl,
-      inventory: 1,
-      price: Number(priceTextField.current.value)
+      inventory: inventoryRef.current.value,
+      price: Number(priceRef.current.value)
     }
     item = await putItem(item, itemId, authContext);
     setIsUpdated(true);
@@ -129,15 +156,13 @@ const ItemUpdate = (props) => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Typography component="h1" variant="h5">
-          Add new item
-                </Typography>
+        <Typography component="h1" variant="h5">Item Update</Typography>
         <ImportedImage dataUrl={imgDataUrl} />
         <form className={classes.form}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
-                inputRef={nameTextField}
+                inputRef={nameRef}
                 defaultValue="UPDATE ME"
                 name="itemName"
                 variant="outlined"
@@ -150,7 +175,7 @@ const ItemUpdate = (props) => {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                inputRef={producerTextField}
+                inputRef={producerRef}
                 defaultValue="UPDATE ME"
                 name="itemProducer"
                 variant="outlined"
@@ -163,11 +188,12 @@ const ItemUpdate = (props) => {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                inputRef={detailsTextField}
+                inputRef={detailsRef}
                 defaultValue="UPDATE ME"
                 name="itemDetail"
                 variant="outlined"
                 multiline
+                rows={3}
                 fullWidth
                 id="itemDetail"
                 label="Details"
@@ -176,7 +202,34 @@ const ItemUpdate = (props) => {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                inputRef={priceTextField}
+                inputRef={optionsRef}
+                defaultValue="UPDATE ME"
+                name="itemOptions"
+                variant="outlined"
+                multiline
+                rows={3}
+                fullWidth
+                id="itemOptions"
+                label="Options"
+                autoFocus
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                inputRef={inventoryRef}
+                defaultValue={1}
+                type="number"
+                name="itemInventory"
+                variant="outlined"
+                fullWidth
+                id="itemInventory"
+                label="Inventory"
+                autoFocus
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                inputRef={priceRef}
                 defaultValue="UPDATE ME"
                 name="itemPrice"
                 variant="outlined"

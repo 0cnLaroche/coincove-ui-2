@@ -90,11 +90,12 @@ const Checkout = ({basket, handleBasketUpdate}) => {
       setOpenApprovedDialog(false);
       history.push('/'); // Redirect to homepage 
     }
+    /** Handle stepping to next step. Do some validation before */
     const handleNext = () => {
-      if(!(activeStep === 1 && isValidationError)) {
-        setActiveStep(activeStep + 1);
+      if(activeStep === 1 && isValidationError) {
+        alert("Please complete shipping information");
       } else {
-        alert("Please complete shipping information")
+        setActiveStep(activeStep + 1);
       }
     }
     const handleBack = () => {
@@ -123,7 +124,7 @@ const Checkout = ({basket, handleBasketUpdate}) => {
           <PaypalButton 
             handleOnApproved={handleOnApproved}
             handleEmailChange={handleEmailChange}
-            order={{
+            statement={{
               items: basket,
               total: invoiceTotal,
               shipping: invoiceShipping,
