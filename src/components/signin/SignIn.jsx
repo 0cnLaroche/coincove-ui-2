@@ -41,15 +41,21 @@ const SignIn = (props) => {
   const { authContext, setAuthContext} = useAuthContext();
 
   const login = async () => {
-    let response = await auth(userName, password);
-    let authentication = response.data;
-    if (authentication) {
-      setAuthContext(authentication);
-      setLoggedIn(true);
-      setIsError(false);
-    } else {
+    try {
+      let response = await auth(userName, password);
+      let authentication = response.data;
+      if (authentication.token) {
+        setAuthContext(authentication);
+        setLoggedIn(true);
+        setIsError(false);
+      } else {
+        setIsError(true);
+      }
+    } catch (error) {
       setIsError(true);
     }
+    
+
   }
   const handleCloseErrorAlert = (event, reason) => {
     if (reason === 'clickaway') {
@@ -127,7 +133,7 @@ const SignIn = (props) => {
               </Link>
               <Snackbar open={isError} autoHideDuration={6000} onClose={handleCloseErrorAlert}>
                 <Alert onClose={handleCloseErrorAlert} severity="error">
-                  The username or password provided were incorrect!
+                  The username or password provided are incorrect!
                 </Alert>
             </Snackbar>
             </Grid>
