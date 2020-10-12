@@ -125,3 +125,7 @@ export const getOrder = async (id, authentication) => {
     return data;
 }
 
+export const postContactForm = (form) => {
+    return axios.post(`${HOST}/contact`, form);
+}
+

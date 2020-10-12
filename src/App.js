@@ -7,9 +7,9 @@ import { AuthContext } from './context/auth';
 import { ItemContext } from './context/item';
 
 const sections = [
-    { title:"Sign Up", url: "/sign-up", component:{SignUp}},
-    { title:"Vendu", url: "/", component:{Home}},
-    { title:"Contact us", url: "/contact-us", component:{ContactUs}}
+    { title:"Sign Up", url: "/sign-up"},
+    { title:"Vendu", url: "/"},
+    { title:"Contact Us", url: "/contact-us"}
   ];
 const title = process.env.REACT_APP_TITLE;
 
@@ -52,8 +52,8 @@ class App extends React.Component {
             <ItemContext.Provider value={{itemContext: this.state.currentItem, setItemContext: this.setCurrentItem}}>
             <Router>
                 <CssBaseline />
+                <Header title={title} basketSize={this.state.basket.length} sections={sections}/>
                 <Container maxWidth="lg">
-                    <Header title={title} basketSize={this.state.basket.length} sections={sections}/>
                     <main>
                     <Switch>
                         <Route path="/" exact>

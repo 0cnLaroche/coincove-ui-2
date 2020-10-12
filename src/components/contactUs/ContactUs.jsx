@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { Container, CssBaseline, Avatar, TextField, Button,
 Typography } from '@material-ui/core';
 import EmailOutlinedIcon from '@material-ui/icons/EmailOutlined';
+import { postContactForm } from '../../api'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -27,14 +29,29 @@ const useStyles = makeStyles((theme) => ({
 
 const ContactUs = (props) => {
     const classes = useStyles();
+    const [isSubmitted, setSubmitted] = useState(false);
     const name = React.useRef();
     const email = React.useRef();
     const message = React.useRef();
+
     const send = () => {
-        const mailto = 
-        `mailto:samuellaroche@live.ca?subject=client-email-${name.current.value}&cc=${email.current.value}&body=${message.current.value}`;
-        console.log(mailto);
+      const form = {
+        name: name.current.value,
+        email: email.current.value,
+        message: message.current.value
+      }
+      postContactForm(form)
+      .then(data => {
+        setSubmitted(true);
+      })
     }
+
+    if(isSubmitted) {
+      return (
+        <Redirect to="/"/>
+      )
+    }
+
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline/>
@@ -42,14 +59,14 @@ const ContactUs = (props) => {
             <Avatar className={classes.avatar}>
                 <EmailOutlinedIcon />
             </Avatar>
-            <Typography component="h1" variant="h5">
+            <Typography component="h2" variant="h5">
                 Contact Us
             </Typography>
         <form className={classes.form} noValidate>
           <TextField
             // value={name}
             // onChange={e => setName(e.target.value)}
-            ref={name}
+            inputRef={name}
             variant="outlined"
             margin="normal"
             required
@@ -63,7 +80,7 @@ const ContactUs = (props) => {
           <TextField
             // value={email}
             // onChange={e => setEmail(e.target.value)}
-            ref={email}
+            inputRef={email}
             variant="outlined"
             margin="normal"
             required
@@ -77,12 +94,13 @@ const ContactUs = (props) => {
           <TextField
             // value={message}
             //onChange={e => setMessage(e.target.value)}
-            ref={message}
+            inputRef={message}
             variant="outlined"
             margin="normal"
             required
             fullWidth
             multiline
+            rows="6"
             name="message"
             label="Message"
             id="message"

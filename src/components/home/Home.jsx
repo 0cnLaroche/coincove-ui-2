@@ -11,6 +11,7 @@ import {
     Button,
     makeStyles } from '@material-ui/core';
 import { Link as RouterLink } from 'react-router-dom';
+import { Copyright } from '../';
 import { fetchItemList } from '../../api';
 
 
@@ -78,23 +79,28 @@ const Home = ({handleBasketItemAdded}) => {
                     />
                   </CardActionArea>
                   <CardContent className={classes.cardContent}>
-                    <Typography gutterBottom variant="h5" component="h2">
-                      {item.name}
-                    </Typography>
-                    <Typography>
-                      $ {ccyFormat(item.price)}
-                    </Typography>
+                    <Grid container justify="space-between">
+                      <Grid item xs={12}>
+                        <Typography gutterBottom variant="h5" component="h2">
+                          {item.name}
+                        </Typography>
+                      </Grid>
+                      <Grid item>
+                        <Typography>$ {ccyFormat(item.price)}</Typography>
+                      </Grid>
+                      <Grid item>
+                        <Button size="small" variant="contained" color="secondary" onClick={(e) => handleBasketItemAdded(item)}>
+                          Add to cart
+                        </Button>
+                      </Grid>
+                    </Grid>
                   </CardContent>
-                  <CardActions>
-                    <Button size="small" variant="contained" color="secondary" onClick={(e) => handleBasketItemAdded(item)}>
-                      Add to cart
-                    </Button>
-                  </CardActions>
                 </Card>
               </Grid>
             ))}
           </Grid>
         </Container>
+        <Copyright/>
         </main>
 
     )
