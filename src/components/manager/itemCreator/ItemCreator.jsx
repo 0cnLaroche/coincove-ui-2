@@ -72,14 +72,26 @@ const ItemCreator = (props) => {
 
   const onFileChange = (event) => {
     var file = event.target.files[0];
-    setSelectedFile(file);
-
-    var reader = new FileReader();
-    reader.onload = () => {
-      var dataUrl = reader.result;
-      setImgDataUrl(dataUrl);
+    if (!file) {
+      return;
     }
-    reader.readAsDataURL(file);
+    new Compressor(file, {
+      maxHeight:1100,
+      maxWidth:1100,
+      success(compressedFile) {
+
+        setSelectedFile(compressedFile);
+
+        var reader = new FileReader();
+        reader.onload = () => {
+          var dataUrl = reader.result;
+          setImgDataUrl(dataUrl);
+        }
+        reader.readAsDataURL(compressedFile);
+
+      }
+    });
+
   }
 
   const validateOptions = () => {

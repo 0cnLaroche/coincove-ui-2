@@ -3,6 +3,7 @@ import { useAuthContext } from '../../../context/auth';
 import { useItemContext } from '../../../context/item';
 import ImportedImage from '../ImportedImage';
 import { useParams, Redirect } from 'react-router-dom';
+import Compressor from 'compressorjs';
 import {
   Container,
   makeStyles,
@@ -79,15 +80,25 @@ const ItemUpdate = (props) => {
 
   const onFileChange = event => {
     var file = event.target.files[0];
-    setSelectedFile(file);
-
-    var reader = new FileReader();
-    reader.onload = () => {
-      var dataUrl = reader.result;
-      console.log(dataUrl);
-      setImgDataUrl(dataUrl);
+    if (!file) {
+      return;
     }
-    reader.readAsDataURL(file);
+    new Compressor(file, {
+      maxHeight:1100,
+      maxWidth:1100,
+      success(compressedFile) {
+
+        setSelectedFile(compressedFile);
+
+        var reader = new FileReader();
+        reader.onload = () => {
+          var dataUrl = reader.result;
+          setImgDataUrl(dataUrl);
+        }
+        reader.readAsDataURL(compressedFile);
+
+      }
+    });
   }
 
   const validateOptions = () => {
