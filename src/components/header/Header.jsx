@@ -6,9 +6,14 @@ import Button from '@material-ui/core/Button';
 import Badge from '@material-ui/core/Badge';
 import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import HomeRoundedIcon from '@material-ui/icons/HomeRounded';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import MenuIcon from '@material-ui/icons/Menu';
+import AccountCircleRoundedIcon from '@material-ui/icons/AccountCircleRounded';
+import EmailRoundedIcon from '@material-ui/icons/EmailRounded';
+import BorderColorRoundedIcon from '@material-ui/icons/BorderColorRounded';
+import CheckRoundedIcon from '@material-ui/icons/CheckRounded';
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, Divider } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import {Link as StyledLink} from '@material-ui/core';
 import Hidden from '@material-ui/core/Hidden';
@@ -33,6 +38,9 @@ const useStyles = makeStyles((theme) => ({
     toolbarLink: {
       padding: theme.spacing(1),
       flexShrink: 0,
+    },
+    list: {
+      width: 200
     }
   }));
 
@@ -96,12 +104,18 @@ const Header = (props) => {
       if(auth) {
         return (
           <ListItem onClick={logOut}>
+            <ListItemIcon>
+              <AccountCircleRoundedIcon/>
+            </ListItemIcon>
             <ListItemText primary="Log Out"/>
           </ListItem>
         )
       } else {
         return (
-          <ListItem to="/sign-in" component={Link}>
+          <ListItem to="/sign-in" component={NavLink}>
+            <ListItemIcon>
+              <AccountCircleRoundedIcon/>
+            </ListItemIcon>
             <ListItemText primary="Log In"/>
           </ListItem>
         )
@@ -118,44 +132,57 @@ const Header = (props) => {
             edge="end"
             open={isComponentVisible}
           >
-            <List>
-              <ListItem component={Link} to="/">
+            <List className={classes.list}>
+              <ListItem component={NavLink} to="/">
+                <ListItemIcon>
+                  <HomeRoundedIcon/>
+                </ListItemIcon>
                 <ListItemText primary="Home"/>
               </ListItem>
-              <ListItem component={Link} to="/checkout">
-                <ListItemIcon>
-                  <ShoppingCartIcon/>
-                </ListItemIcon>
+              <ListItem component={NavLink} to="/checkout">
+                <Badge badgeContent={basketSize} color= "primary">
+                  <ListItemIcon>
+                    <ShoppingCartIcon/>
+                  </ListItemIcon>
+                </Badge>
                 <ListItemText primary="Cart"/>
               </ListItem>
+              {logLink(authContext)}
+              <Divider/>
+              {sections.map((section) => (
+                <ListItem 
+                  key={section.title} 
+                  component={NavLink} 
+                  to={section.url}
+                >
+                  <ListItemText primary={section.title}/>
+                </ListItem>
+              ))}
+              <Divider/>
+              <ListItem component={NavLink} to="/contact-us">
+                <ListItemIcon>
+                  <EmailRoundedIcon/>
+                </ListItemIcon>
+                <ListItemText primary="Contact us"/>
+              </ListItem>
               {authContext ? 
-                <ListItem component={Link} to="/manager/item-creator">
+                <ListItem component={NavLink} to="/manager/item-creator">
                   <ListItemText primary="Add item"/>
                 </ListItem>
               : null }
               {authContext ? 
-                <ListItem component={Link} to="/manager/orders">
+                <ListItem component={NavLink} to="/manager/orders">
                   <ListItemText primary="Orders"/>
                 </ListItem>
               : null }
               {(authContext && itemContext) ? 
-                <ListItem component={Link} to={`/manager/item-update/${itemContext._id}`}>
+                <ListItem component={NavLink} to={`/manager/item-update/${itemContext._id}`}>
                   <ListItemIcon>
                     <ShoppingCartIcon/>
                   </ListItemIcon>
                   <ListItemText primary="Update item"/>
                 </ListItem>
               : null }
-              {logLink(authContext)}
-              {sections.map((section) => (
-                <ListItem 
-                  key={section.title} 
-                  component={Link} 
-                  to={section.url}
-                >
-                  <ListItemText primary={section.title}/>
-                </ListItem>
-              ))}
             </List>
           </Drawer>
         </React.Fragment>
@@ -227,6 +254,16 @@ const Header = (props) => {
               {section.title}
             </Link>
           ))}
+          <Link
+              color="inherit"
+              noWrap
+              variant="body2"
+              className={classes.toolbarLink}
+              component={RouterLink}
+              to="/contact-us"
+            >
+            Contact us
+          </Link> 
         </React.Fragment>
       )
     }

@@ -8,8 +8,7 @@ import { ItemContext } from './context/item';
 
 const sections = [
     { title:"Sign Up", url: "/sign-up"},
-    { title:"Vendu", url: "/"},
-    { title:"Contact Us", url: "/contact-us"}
+    { title:"Vendu", url: "/"}
   ];
 const title = process.env.REACT_APP_TITLE;
 
