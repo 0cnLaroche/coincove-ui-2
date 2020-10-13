@@ -52,8 +52,7 @@ class App extends React.Component {
             <Router>
                 <CssBaseline />
                 <Header title={title} basketSize={this.state.basket.length} sections={sections}/>
-                <Container maxWidth="lg">
-                    <main>
+                <Container maxWidth="lg" component="main" pt={8}>
                     <Switch>
                         <Route path="/" exact>
                             <Home handleBasketItemAdded={this.handleBasketItemAdded}/>
@@ -69,7 +68,6 @@ class App extends React.Component {
                         </Route> 
                         <PrivateRoute path="/manager" component={Manager}/>
                     </Switch>
-                </main>
                 </Container>
             </Router>
             </ItemContext.Provider>

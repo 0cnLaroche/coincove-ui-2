@@ -8,6 +8,9 @@ import { postContactForm } from '../../api'
 
 
 const useStyles = makeStyles((theme) => ({
+    root: {
+      paddingBottom: theme.spacing(8)
+    },
     paper: {
       marginTop: theme.spacing(8),
       display: 'flex',
@@ -53,70 +56,70 @@ const ContactUs = (props) => {
     }
 
     return (
-        <Container component="main" maxWidth="xs">
+        <Container component="main" maxWidth="xs" className={classes.root}>
             <CssBaseline/>
             <div className={classes.paper}>
-            <Avatar className={classes.avatar}>
-                <EmailOutlinedIcon />
-            </Avatar>
-            <Typography component="h2" variant="h5">
-                Contact Us
-            </Typography>
-        <form className={classes.form} noValidate>
-          <TextField
-            // value={name}
-            // onChange={e => setName(e.target.value)}
-            inputRef={name}
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="name"
-            label="Name"
-            name="name"
-            autoComplete="name"
-            autoFocus
-          />
-          <TextField
-            // value={email}
-            // onChange={e => setEmail(e.target.value)}
-            inputRef={email}
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
-          />
-          <TextField
-            // value={message}
-            //onChange={e => setMessage(e.target.value)}
-            inputRef={message}
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            multiline
-            rows="6"
-            name="message"
-            label="Message"
-            id="message"
-          />
-          <Button
-            type="button"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-            onClick={send}
-          >
-            Send your message
-          </Button>
-            </form>
-            </div>
+              <Avatar className={classes.avatar}>
+                  <EmailOutlinedIcon />
+              </Avatar>
+              <Typography component="h2" variant="h5">
+                  Contact Us
+              </Typography>
+              <form className={classes.form} noValidate>
+                <TextField
+                  // value={name}
+                  // onChange={e => setName(e.target.value)}
+                  inputRef={name}
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="name"
+                  label="Name"
+                  name="name"
+                  autoComplete="name"
+                  autoFocus
+                />
+                <TextField
+                  // value={email}
+                  // onChange={e => setEmail(e.target.value)}
+                  inputRef={email}
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                />
+                <TextField
+                  // value={message}
+                  //onChange={e => setMessage(e.target.value)}
+                  inputRef={message}
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  multiline
+                  rows="6"
+                  name="message"
+                  label="Message"
+                  id="message"
+                />
+                <Button
+                  type="button"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                  onClick={send}
+                >
+                  Send your message
+                </Button>
+              </form>
+          </div>
         </Container>
     )
 }

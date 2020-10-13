@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
       marginTop: theme.spacing(4),
     },
     cardGrid: {
-      paddingTop: theme.spacing(8),
+      //paddingTop: theme.spacing(8), // FIXME margin has been set on header
       paddingBottom: theme.spacing(8),
     },
     card: {
@@ -64,7 +64,7 @@ const Home = ({handleBasketItemAdded}) => {
     },[]);
 
     return (
-        <main>
+        <React.Fragment>
         <Container className={classes.cardGrid} maxWidth="md">
           {/* End hero unit */}
           <Grid container spacing={4}>
@@ -101,7 +101,7 @@ const Home = ({handleBasketItemAdded}) => {
           </Grid>
         </Container>
         <Copyright/>
-        </main>
+        </React.Fragment>
 
     )
 }

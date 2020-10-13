@@ -23,7 +23,8 @@ import { useItemContext } from '../../context/item';
 
 const useStyles = makeStyles((theme) => ({
     toolbar: {
-      borderBottom: `1px solid ${theme.palette.divider}`
+      borderBottom: `1px solid ${theme.palette.divider}`,
+      marginBottom: theme.spacing(8) // FIXME set padding on components instead
     },
     toolbarTitle: {
       flex: 1,
@@ -50,31 +51,10 @@ const Link = (props) => {
   )
 }
 
-function useComponentVisible(initialIsVisible) {
-  const [isComponentVisible, setIsComponentVisible] = useState(initialIsVisible);
-  const ref = useRef(null);
-
-  const handleClickOutside = (event) => {
-      if (ref.current && !ref.current.contains(event.target)) {
-          setIsComponentVisible(false);
-      }
-  };
-
-  useEffect(() => {
-      document.addEventListener('click', handleClickOutside, true);
-      return () => {
-          document.removeEventListener('click', handleClickOutside, true);
-      };
-  });
-
-  return { ref, isComponentVisible, setIsComponentVisible };
-}
-
 const Header = (props) => {
     const classes = useStyles();
     const { sections, title, basketSize } = props;
-    //const [drawerOpen, setDrawerOpen] = useState(false);
-    const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
+    const [ isComponentVisible, setIsComponentVisible ] = useState(false);
     const { authContext, setAuthContext } = useAuthContext();
     const { itemContext } = useItemContext();
 
@@ -103,7 +83,7 @@ const Header = (props) => {
     const logLink = (auth) => {
       if(auth) {
         return (
-          <ListItem onClick={logOut}>
+          <ListItem button onClick={logOut}>
             <ListItemIcon>
               <AccountCircleRoundedIcon/>
             </ListItemIcon>
@@ -112,7 +92,7 @@ const Header = (props) => {
         )
       } else {
         return (
-          <ListItem to="/sign-in" component={NavLink}>
+          <ListItem button to="/sign-in" component={NavLink}>
             <ListItemIcon>
               <AccountCircleRoundedIcon/>
             </ListItemIcon>
@@ -131,15 +111,16 @@ const Header = (props) => {
           <Drawer
             edge="end"
             open={isComponentVisible}
+            onClose={handleDrawerClose}
           >
-            <List className={classes.list}>
-              <ListItem component={NavLink} to="/">
+            <List className={classes.list} onClick={handleDrawerClose}>
+              <ListItem button component={NavLink} to="/">
                 <ListItemIcon>
                   <HomeRoundedIcon/>
                 </ListItemIcon>
                 <ListItemText primary="Home"/>
               </ListItem>
-              <ListItem component={NavLink} to="/checkout">
+              <ListItem button component={NavLink} to="/checkout">
                 <Badge badgeContent={basketSize} color= "primary">
                   <ListItemIcon>
                     <ShoppingCartIcon/>
@@ -154,32 +135,33 @@ const Header = (props) => {
                   key={section.title} 
                   component={NavLink} 
                   to={section.url}
+                  button
                 >
+                  <ListItemIcon>
+                    <CheckRoundedIcon/>
+                  </ListItemIcon>
                   <ListItemText primary={section.title}/>
                 </ListItem>
               ))}
               <Divider/>
-              <ListItem component={NavLink} to="/contact-us">
+              <ListItem button component={NavLink} to="/contact-us">
                 <ListItemIcon>
                   <EmailRoundedIcon/>
                 </ListItemIcon>
                 <ListItemText primary="Contact us"/>
               </ListItem>
               {authContext ? 
-                <ListItem component={NavLink} to="/manager/item-creator">
+                <ListItem button component={NavLink} to="/manager/item-creator">
                   <ListItemText primary="Add item"/>
                 </ListItem>
               : null }
               {authContext ? 
-                <ListItem component={NavLink} to="/manager/orders">
+                <ListItem button component={NavLink} to="/manager/orders">
                   <ListItemText primary="Orders"/>
                 </ListItem>
               : null }
               {(authContext && itemContext) ? 
-                <ListItem component={NavLink} to={`/manager/item-update/${itemContext._id}`}>
-                  <ListItemIcon>
-                    <ShoppingCartIcon/>
-                  </ListItemIcon>
+                <ListItem button component={NavLink} to={`/manager/item-update/${itemContext._id}`}>
                   <ListItemText primary="Update item"/>
                 </ListItem>
               : null }
@@ -267,7 +249,6 @@ const Header = (props) => {
         </React.Fragment>
       )
     }
-
     return (
       <React.Fragment>
         <Toolbar className={classes.toolbar}>
@@ -278,9 +259,7 @@ const Header = (props) => {
                 <MenuIcon/>
               </IconButton>
             </Badge>
-            <div ref={ref}>
-              {isComponentVisible && getDrawer()}
-            </div>
+            {isComponentVisible && getDrawer()}
           </Hidden>
           <Typography
             component={NavLink}

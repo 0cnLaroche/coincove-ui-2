@@ -15,7 +15,7 @@ const SHIPPING_THRESHOLD = Number(process.env.REACT_APP_SHIPPING_THRESHOLD);
 
 const useStyles = makeStyles(theme => ({
   root: {
-    marginBottom: theme.spacing(6)
+    paddingBottom: theme.spacing(6)
   },
   buttons: {
     display: 'flex',
@@ -141,7 +141,7 @@ const Checkout = ({basket, handleBasketUpdate}) => {
 
     return (
       <div>
-        <Container component="main" maxWidth="md">
+        <Container component="main" maxWidth="md" className={classes.root}>
           <Typography component="h1" variant="h4" align="center">Checkout</Typography>
           <Stepper activeStep={activeStep} className={classes.stepper}>
             {steps.map(label => (
