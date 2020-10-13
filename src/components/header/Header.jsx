@@ -22,9 +22,11 @@ import { useAuthContext } from '../../context/auth';
 import { useItemContext } from '../../context/item';
 
 const useStyles = makeStyles((theme) => ({
+    root: {
+      marginBottom: theme.spacing(6) // FIXME set padding on components instead
+    },
     toolbar: {
       borderBottom: `1px solid ${theme.palette.divider}`,
-      marginBottom: theme.spacing(8) // FIXME set padding on components instead
     },
     toolbarTitle: {
       flex: 1,
@@ -251,46 +253,48 @@ const Header = (props) => {
     }
     return (
       <React.Fragment>
-        <Toolbar className={classes.toolbar}>
-          {/*<Button to="#" size="small" component={RouterLink}>Subscribe</Button>*/}
-          <Hidden mdUp>
-            <Badge badgeContent={basketSize} color="secondary"> 
-              <IconButton onClick={handleDrawerOpen}>
-                <MenuIcon/>
-              </IconButton>
-            </Badge>
-            {isComponentVisible && getDrawer()}
-          </Hidden>
-          <Typography
-            component={NavLink}
-            style={{ textDecoration: 'none', color: 'unset' }}
-            to="/"
-            variant="h3"
-            color="inherit"
-            align="center"
-            noWrap
+        <div className={classes.root}>
+          <Toolbar className={classes.toolbar}>
+            {/*<Button to="#" size="small" component={RouterLink}>Subscribe</Button>*/}
+            <Hidden mdUp>
+              <Badge badgeContent={basketSize} color="secondary"> 
+                <IconButton onClick={handleDrawerOpen}>
+                  <MenuIcon/>
+                </IconButton>
+              </Badge>
+              {isComponentVisible && getDrawer()}
+            </Hidden>
+            <Typography
+              component={NavLink}
+              style={{ textDecoration: 'none', color: 'unset' }}
+              to="/"
+              variant="h3"
+              color="inherit"
+              align="center"
+              noWrap
 
-            className={classes.toolbarTitle}
-          >
-            {title}
-          </Typography>
-          <Hidden smDown>
-            <IconButton to="#" component={RouterLink}>
-              <SearchIcon />
-            </IconButton>
-            <Badge badgeContent={basketSize} color="secondary">
-              <IconButton to="/checkout" component={RouterLink} >
-                <ShoppingCartIcon/>
+              className={classes.toolbarTitle}
+            >
+              {title}
+            </Typography>
+            <Hidden smDown>
+              <IconButton to="#" component={RouterLink}>
+                <SearchIcon />
               </IconButton>
-            </Badge>
-          {userButton(authContext)}
-          </Hidden>
-        </Toolbar>
-        <Hidden smDown>
-          <Toolbar component="nav" variant="dense" className={classes.toolbarSecondary}>
-            {getLinks()}
+              <Badge badgeContent={basketSize} color="secondary">
+                <IconButton to="/checkout" component={RouterLink} >
+                  <ShoppingCartIcon/>
+                </IconButton>
+              </Badge>
+            {userButton(authContext)}
+            </Hidden>
           </Toolbar>
-        </Hidden>
+          <Hidden smDown>
+            <Toolbar component="nav" variant="dense" className={classes.toolbarSecondary}>
+              {getLinks()}
+            </Toolbar>
+          </Hidden>
+        </div>
       </React.Fragment>
     );
   }

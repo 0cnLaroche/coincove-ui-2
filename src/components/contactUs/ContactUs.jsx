@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
-import { Container, CssBaseline, Avatar, TextField, Button,
-Typography } from '@material-ui/core';
+import { Container, CssBaseline, Avatar, TextField, Button, Typography } from '@material-ui/core';
 import EmailOutlinedIcon from '@material-ui/icons/EmailOutlined';
 import { postContactForm } from '../../api'
 
