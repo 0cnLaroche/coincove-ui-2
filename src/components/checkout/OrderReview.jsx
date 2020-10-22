@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styles from './Checkout.module.css';
 import {TableContainer, Table, TableHead, TableRow, TableCell, TableBody} from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';

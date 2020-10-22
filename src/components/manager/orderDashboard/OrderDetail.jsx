@@ -1,6 +1,4 @@
 import React from 'react';
-import {Container} from '@material-ui/core';
-import {makeStyles} from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -42,7 +40,7 @@ function createRow(desc, options, qty, unit) {
 
 /** Displays order details, marchant view */
 const OrderDetail = ({order}) => {
-    const { orderLines, taxes, shipping, subtotal, total } = order; 
+    const { orderLines, shipping, subtotal, total } = order; 
     const rows = orderLines.map((line) => createRow(line.description, line.options, line.units, line.price));
 
     return (

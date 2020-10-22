@@ -1,0 +1,26 @@
+{
+  "host": {
+    "domain": "< THIS VALUE SHOULD BE OVERRIDED >",
+    "protocol": "https",
+    "api": "/api"
+  },
+  "meta": {
+    "title": "< THIS VALUE SHOULD BE OVERRIDED >",
+    "description_short": "< THIS VALUE SHOULD BE OVERRIDED >",
+    "description": "< THIS VALUE SHOULD BE OVERRIDED >"
+  },
+  "pay": {
+    "paypal_client_id": "< THIS VALUE SHOULD BE OVERRIDED >"
+  },
+  "order": {
+    "shipping": {
+      "rate": 0.0,
+      "threshold": 0.0
+    }
+  },
+  "theme": {
+    "primary": "#2196f3",
+    "secondary": "#f50057",
+    "logo": "ecove-logo.png"
+  }
+}

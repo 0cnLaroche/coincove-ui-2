@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -11,7 +11,7 @@ import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircleRoundedIcon from '@material-ui/icons/AccountCircleRounded';
 import EmailRoundedIcon from '@material-ui/icons/EmailRounded';
-import BorderColorRoundedIcon from '@material-ui/icons/BorderColorRounded';
+//import BorderColorRoundedIcon from '@material-ui/icons/BorderColorRounded';
 import CheckRoundedIcon from '@material-ui/icons/CheckRounded';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Divider } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
@@ -123,7 +123,7 @@ const Header = (props) => {
                 <ListItemText primary="Home"/>
               </ListItem>
               <ListItem button component={NavLink} to="/checkout">
-                <Badge badgeContent={basketSize} color= "primary">
+                <Badge overlap="circle" badgeContent={basketSize} color= "primary">
                   <ListItemIcon>
                     <ShoppingCartIcon/>
                   </ListItemIcon>
@@ -257,7 +257,7 @@ const Header = (props) => {
           <Toolbar className={classes.toolbar}>
             {/*<Button to="#" size="small" component={RouterLink}>Subscribe</Button>*/}
             <Hidden mdUp>
-              <Badge badgeContent={basketSize} color="secondary"> 
+              <Badge overlap="circle" badgeContent={basketSize} color="secondary"> 
                 <IconButton onClick={handleDrawerOpen}>
                   <MenuIcon/>
                 </IconButton>
@@ -281,7 +281,7 @@ const Header = (props) => {
               <IconButton to="#" component={RouterLink}>
                 <SearchIcon />
               </IconButton>
-              <Badge badgeContent={basketSize} color="secondary">
+              <Badge overlap="circle" badgeContent={basketSize} color="secondary">
                 <IconButton to="/checkout" component={RouterLink} >
                   <ShoppingCartIcon/>
                 </IconButton>

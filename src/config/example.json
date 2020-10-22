@@ -1,0 +1,27 @@
+{
+    "host": {
+      "domain": "example.ca",
+      "protocol": "http or https",
+      "port": 8080,
+      "api": "/api"
+    },
+    "meta": {
+      "title": "Company name",
+      "description_short": "Company name - Short description",
+      "description": "Long description"
+    },
+    "pay": {
+      "paypal_client_id": "paypal client id token"
+    },
+    "order": {
+      "shipping": {
+        "rate": 1.99,
+        "threshold": 14.99
+      }
+    },
+    "theme": {
+        "primary": "primary color used for main buttons and android frame color (hex)",
+        "secondary": "secondary color (hex)",
+        "logo": "name of logo file ie logoFile.svg"
+    }
+  }

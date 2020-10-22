@@ -146,7 +146,7 @@ const ItemCreator = (props) => {
       options: JSON.parse(itemOptions)
     }
     //console.log(item);
-    item = await postItem(item, authContext);
+    await postItem(item, authContext);
     setIsCreated(true);
   }
   if(isCreated) {

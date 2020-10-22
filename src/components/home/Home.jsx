@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Helmet from 'react-helmet';
 import { 
     Typography,
     Container,
@@ -6,13 +7,12 @@ import {
     Card,
     CardContent,
     CardMedia,
-    CardActions,
     CardActionArea,
     Button,
     makeStyles } from '@material-ui/core';
 import { Link as RouterLink } from 'react-router-dom';
 import { Copyright } from '../';
-import { fetchItemList } from '../../api';
+import { fetchItemList, getHost } from '../../api';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -51,9 +51,31 @@ function ccyFormat(num) {
     return `${num.toFixed(2)}`;
 }
 
+function buildStructuredData(items) {
+  if (items.length > 0) {
+    const listItems = [];
+    for (let i = 0; i < 3; i++) {
+      listItems.push({
+        "@type": "ListItem",
+        "position": i + 1,
+        "url": `${getHost()}/items/${items[i]._id}`
+      })
+    }
+    const data = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": listItems
+    }
+    return JSON.stringify(data);
+  } else {
+    return null;
+  }
+}
+
 const Home = ({handleBasketItemAdded}) => {
     const classes = useStyles();
     const [ items, setItems] = useState([]);
+    const structuredData = buildStructuredData(items);
     
     useEffect(() => {
       async function fetchData() {
@@ -65,6 +87,9 @@ const Home = ({handleBasketItemAdded}) => {
 
     return (
         <React.Fragment>
+        <Helmet>
+          <script type="application/ld+json">{structuredData}</script>
+        </Helmet>
         <Container className={classes.cardGrid} maxWidth="md">
           {/* End hero unit */}
           <Grid container spacing={4}>

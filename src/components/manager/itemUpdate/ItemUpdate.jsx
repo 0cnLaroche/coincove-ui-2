@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuthContext } from '../../../context/auth';
-import { useItemContext } from '../../../context/item';
 import ImportedImage from '../ImportedImage';
 import { useParams, Redirect } from 'react-router-dom';
 import Compressor from 'compressorjs';
@@ -155,7 +154,7 @@ const ItemUpdate = (props) => {
       inventory: inventoryRef.current.value,
       price: Number(priceRef.current.value)
     }
-    item = await putItem(item, itemId, authContext);
+    await putItem(item, itemId, authContext);
     setIsUpdated(true);
   }
   if(isUpdated) {

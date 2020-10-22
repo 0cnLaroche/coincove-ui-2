@@ -8,10 +8,11 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } 
 import PaypalButton from '../paypal/PaypalButton';
 import OrderReview from './OrderReview';
 import AddressForm from '../addressForm/AddressForm';
+import Config from '../../util/Config';
 
 const TAX_RATE = 0.07; // Taxes are disabled
-const SHIPPING_RATE = Number(process.env.REACT_APP_SHIPPING_RATE);
-const SHIPPING_THRESHOLD = Number(process.env.REACT_APP_SHIPPING_THRESHOLD);
+const SHIPPING_RATE = Number(Config.order.shipping.rate);
+const SHIPPING_THRESHOLD = Number(Config.order.shipping.threshold);
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -74,7 +75,6 @@ const Checkout = ({basket, handleBasketUpdate}) => {
     }) ;
     const [isValidationError, setIsValidationError] = useState(true);
     const [email, setEmail] = useState();
-    const errors = [];
     const rows = basket.map((item) => createRow(item.name, item.units, item.price));
     const invoiceSubtotal = subtotal(rows);
     const invoiceTaxes = TAX_RATE * invoiceSubtotal; // Not used at the moment

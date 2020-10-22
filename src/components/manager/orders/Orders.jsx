@@ -1,6 +1,6 @@
 import React, {useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -18,7 +18,7 @@ import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 
 import { getOrders } from '../../../api';
-import { useAuthContext, AuthContext } from '../../../context/auth';
+import { useAuthContext } from '../../../context/auth';
 
 const formatDate = (object) => {
   let date = new Date(object);
