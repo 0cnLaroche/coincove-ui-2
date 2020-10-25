@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Config from '../util/Config';
 
-const PORT = Config.host.port ? `:${Config.host.port}` : null;
+const PORT = Config.host.port ? `:${Config.host.port}` : "";
 const HOST = `${Config.host.protocol}://${Config.host.domain}${PORT}`;
 const API = `${HOST}${Config.host.api}`;
 
