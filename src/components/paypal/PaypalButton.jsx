@@ -29,7 +29,7 @@ const PaypalButton = ({isScriptLoaded, isScriptLoadSucceed, statement, handleOnA
           description: "description",
           amount: {
             currency_code: "CAD",
-            value: total
+            value: total.toFixed(2)
           },
           //items: items.map( (item) => { return { name: item.name, unit_amount: item.price, quantity: 1 }}),
           //invoice_id: ""
@@ -67,7 +67,8 @@ const PaypalButton = ({isScriptLoaded, isScriptLoadSucceed, statement, handleOnA
       email: emailRef.current.value
     }
 
-    actions.order.capture().then(details => {
+    actions.order.capture()
+    .then(details => {
       const captureId = details.purchase_units[0].payments.captures[0].id;
       order.paymentId = captureId;
       //console.log(paymentData);
@@ -85,16 +86,29 @@ const PaypalButton = ({isScriptLoaded, isScriptLoadSucceed, statement, handleOnA
 
       order.billingAddress = billingAddress;
 
-      postOrder(order);
-      console.debug(order);
-      console.info("Payment Approved: ", paymentData);
-      handleOnApproved();
-      setShowButtons(false);
-      setPaid(true);
+      postOrder(order)
+      .then(res => {
+        console.debug("Order Id :" + res._id);
+        console.info("Payment Approved: ", paymentData);
+        handleOnApproved();
+        setShowButtons(false);
+        setPaid(true);
+      })
+      .catch(error => {
+        console.error("Order error :")
+        console.error(error);
+        setPaymentIsError(true);
+        // TODO: Reimburse client on order error, or trigger contact client
+        alert("Your payment has been received but there was an error while processing your order." +
+        "Please contact us, we need to resolve the issue");
+      })
     })
     .catch(error => {
+      console.error("Paypal error :")
+      console.error(error);
       setPaymentIsError(true);
-      alert("There was an error while processing your payment. Your order will not be submitted")
+      alert("There was an error while processing your payment. Your order will not be submitted." +
+      "Please contact us, we want to resolve the issue")
     });
   };
 
@@ -104,7 +118,6 @@ const PaypalButton = ({isScriptLoaded, isScriptLoadSucceed, statement, handleOnA
       setEmailIsError(false);
       setShowButtons(true);
     } else {
-      console.error("Email is invalid")
       setEmailIsError(true);
       setShowButtons(false);
     }

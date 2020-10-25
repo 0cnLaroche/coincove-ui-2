@@ -119,15 +119,23 @@ export const patchOrder = async (id, updates, authentication) => {
     }
 }
 
+/**
+ * Post a new order to server. Will be validated. 201 if 
+ * payment is good and order is good.
+ * @returns {Promise<Order>} order
+ */
 export const postOrder = (order) => {
-    axios.post(`${API}/orders`, order)
-    .then(response => {
-        if (response.status === 201) {
-            return response.data;
-        }
-    })
-    .catch(error => {
-        console.log(error);
+    return new Promise((resolve, reject) => {
+        axios.post(`${API}/orders`, order)
+        .then(response => {
+            if (response.status === 201) {
+                resolve(response.data);
+            } else {
+                reject(response.data);
+            }
+        }).catch(e => {
+            reject(e);
+        })
     })
 }
 

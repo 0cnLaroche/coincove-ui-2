@@ -37,7 +37,7 @@ function ccyFormat(num) {
 }
 
 function priceRow(qty, unit) {
-    return qty * unit;
+    return (qty * (unit * 100))/100;
 }
 
 function createRow(desc, qty, unit) {
@@ -54,6 +54,10 @@ function shipping(subtotal) {
 
 function subtotal(items) {
     return items.map(({price}) => price).reduce((sum, i) => sum + i, 0);
+}
+
+function taxes(subtotal) {
+  return Number((TAX_RATE * subtotal).toFixed(2));
 }
 
 const steps = ['Review Order', 'Shipping Address', 'Payment'];
@@ -77,7 +81,7 @@ const Checkout = ({basket, handleBasketUpdate}) => {
     const [email, setEmail] = useState();
     const rows = basket.map((item) => createRow(item.name, item.units, item.price));
     const invoiceSubtotal = subtotal(rows);
-    const invoiceTaxes = TAX_RATE * invoiceSubtotal; // Not used at the moment
+    const invoiceTaxes = taxes(invoiceSubtotal); // Not used at the moment
     const invoiceShipping = shipping(invoiceSubtotal);
     const invoiceTotal = invoiceShipping + invoiceSubtotal;
     
@@ -169,19 +173,19 @@ const Checkout = ({basket, handleBasketUpdate}) => {
           </React.Fragment>
         </Container>
         <Dialog open={openApprovedDialog} onClose={handleCloseApprovedDialog} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Payment confirmation</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Thank you for your Order ! Your payment has been confirmed,
-                        you will receive more details about your order very shortly
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseApprovedDialog} color="primary">
-                        Okay!
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <DialogTitle id="form-dialog-title">Payment confirmation</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    Thank you for your Order ! Your payment has been confirmed,
+                    you will receive more details about your order very shortly
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleCloseApprovedDialog} color="primary">
+                    Okay!
+                </Button>
+            </DialogActions>
+        </Dialog>
       </div>
 
     )
