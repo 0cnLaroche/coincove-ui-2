@@ -1,7 +1,5 @@
 import React from 'react';
-import Config from './util/Config';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import Helmet from 'react-helmet';
 import { CssBaseline, Container } from '@material-ui/core';
 import { SignUp, SignIn, Header, Home, Checkout, Manager, 
     PrivateRoute, ItemDetail, ContactUs } from './components';
@@ -13,13 +11,7 @@ const sections = [
     { title:"Vendu", url: "/"}
   ];
 
-const TITLE = Config.meta.title;
-const DESCRIPTION = Config.meta.description ;
-const SHORT_DESCRIPTION = Config.meta.description_short;
-const PROTOCOL = Config.host.protocol;
-const DOMAIN = Config.host.domain;
-const THEME = Config.theme.primary;
-const LOGO = `/${Config.theme.logo}`;
+const TITLE = process.env.REACT_APP_TITLE;
 
 class App extends React.Component {
 
@@ -31,7 +23,8 @@ class App extends React.Component {
             user: null,
             // Loading existing tokens
             authentication: JSON.parse(localStorage.getItem("authentication_storage")),
-            currentItem: null
+            currentItem: null,
+            configs: null
         }
         this.handleBasketItemAdded = this.handleBasketItemAdded.bind(this);
         this.handleBasketUpdate = this.handleBasketUpdate.bind(this);
@@ -58,23 +51,6 @@ class App extends React.Component {
         return (
             <AuthContext.Provider value={{authContext: this.state.authentication, setAuthContext: this.setAuthentication}}>
             <ItemContext.Provider value={{itemContext: this.state.currentItem, setItemContext: this.setCurrentItem}}>
-                <Helmet>
-                    <title>{TITLE}</title>
-                    <meta property="og:title" content={SHORT_DESCRIPTION}/>
-                    <meta property="og:site_name" content={TITLE}/>
-                    <meta property="og:url" content={`${PROTOCOL}://${DOMAIN}`}/>
-                    <meta property="og:type" content="business.business"/>
-                    <meta property="og:description" content={DESCRIPTION}/>
-                    <meta 
-                        name="description"
-                        content={DESCRIPTION}
-                    />
-                    {/* App specific theme */}
-                    <meta name="theme-color" content={THEME} />
-                    <link rel="apple-touch-icon" type="image/svg+xml" href={LOGO} />
-                    <link rel="icon" type="image/svg+xml" href={LOGO}/>
-
-                </Helmet>
             <Router>
                 <CssBaseline />
                 <Header title={TITLE} basketSize={this.state.basket.length} sections={sections}/>

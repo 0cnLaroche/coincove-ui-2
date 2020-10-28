@@ -3,9 +3,8 @@ import ReactDOM from "react-dom";
 import scriptLoader from "react-async-script-loader";
 import {CircularProgress, Grid, Container, TextField, Typography } from '@material-ui/core';
 import { postOrder } from '../../api';
-import Config from '../../util/Config';
 
-const CLIENT_ID = Config.pay.paypal_client_id;
+const CLIENT_ID = process.env.REACT_APP_PAY_CLIENT_ID;
 
 let PayPalButton = null;
 

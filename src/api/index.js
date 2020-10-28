@@ -1,9 +1,7 @@
 import axios from 'axios';
-import Config from '../util/Config';
 
-const PORT = Config.host.port ? `:${Config.host.port}` : "";
-const HOST = `${Config.host.protocol}://${Config.host.domain}${PORT}`;
-const API = `${HOST}${Config.host.api}`;
+const HOST = `${process.env.REACT_APP_HOST}`;
+const API = `${HOST}/api`;
 
 const config = (authentication) => {
     let { token } = authentication;
@@ -151,5 +149,14 @@ export const getOrder = async (id, authentication) => {
 
 export const postContactForm = (form) => {
     return axios.post(`${API}/contact`, form);
+}
+
+export const getConfig = async () => {
+    const { data } = await axios.get(`${HOST}/config`);
+    if (data) {
+        return data;
+    } else {
+        throw new Error("Could not get configurations");
+    }
 }
 

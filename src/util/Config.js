@@ -1,31 +1,28 @@
-import def from '../config/default.json';
-import local from '../config/local.json';
+import { getConfig } from '../api'
 
 const doc = {};
 
-/**
- * Reads and overrides configuration files within 
- * the /config directory in this order :
- *  1. default
- *  2. production
- *  3. local
- * 
- * Singleton pattern, configs are only read once
- */
-const Config = () => {
+const load = async () => {
+    return new Promise((resolve, reject) => {
+        getConfig()
+        .then(data => {
+            Object.assign(doc, data);
+            resolve(doc);
+        }).catch(err => {
+            console.log(err);
+            reject(err);
+        })
+    })
+}
+
+const config = () => {
 
     if (Object.keys(doc).length === 0) {
-    //if (true) {
-        console.debug("Loading configurations");
-
-        Object.assign(doc, def);
-        if (local) {
-            Object.assign(doc, local);
-        }
+        load();
         return doc;
     } else {
         return doc;
     }
 }
 
-export default Config();
+export default config();
